@@ -1,14 +1,13 @@
-//
+//load .env file from dotenv package
 require("dotenv").config();
 
 const express = require("express");
 const inquirer = require("inquirer");
 const fs = require("fs");
-// import path module to save examples later (built-in Node module)
 const path = require("path");
-
 const { Pool } = require("pg");
 
+// allow app to run on different ports
 const PORT = process.env.PORT || 3001;
 const app = express();
 
