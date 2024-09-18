@@ -32,6 +32,10 @@ DO $$
             (7, 'Sanna', 'Marin', 7),
             (8, 'Joe', 'Kabob', 8);
 
+        INSERT INTO manager (employee_id, full_name)
+        VALUES
+            (null, 'None');
+
 
 RAISE NOTICE 'All tables have been updated.';
 
