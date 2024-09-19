@@ -110,63 +110,80 @@ const updateRole = [
 inquirer.prompt(mainPrompt).then((answer) => {
     switch (answer.chooseOption) {
       case "Add Employee":
-        inquirer.prompt(addNewEmployee).then((newEmployee) => {
-          fetch("/api/new-employee", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(newEmployee),
-          })
-            .then((response) => response.json())
-            .then(() => {
-              //return to main prompt
-              inquirer.prompt(mainPrompt);
-            })
-            .catch((err) => {
-              console.error(`Error adding employee:`, err);
+        (async() => {
+          try {
+            const newEmployee = await inquirer.prompt(addNewEmployee);
+            const response = await fetch("/api/new-employee", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(newEmployee),
             });
-        });
+
+            if (!response.ok) {
+              throw new Error(`HTTP error: ${response.status}`);
+            }
+
+            await response.json();
+            await inquirer.prompt(mainPrompt);
+
+          } catch (err) {
+            console.error(`Error adding role:`, err);
+          }
+        })();
         break;
-      // add other cases
+
       case "Add Role":
-        inquirer.prompt(addNewRole).then((newRole) => {
-          fetch("/api/new-role", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(newRole),
-          })
-            .then((response) => response.json())
-            .then(() => {
-              //return to main prompt
-              inquirer.prompt(mainPrompt);
-            })
-            .catch((err) => {
-              console.error(`Error adding role:`, err);
+        (async() => {
+          try {
+            const newRole = await inquirer.prompt(addNewRole);
+            const response = await fetch("/api/new-role", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(newRole),
             });
-        });
+
+            if (!response.ok) {
+              throw new Error(`HTTP error: ${response.status}`);
+            }
+
+            await response.json();
+            await inquirer.prompt(mainPrompt);
+
+          } catch (err) {
+            console.error(`Error adding role:`, err);
+          }
+        })();
         break;
+
       case "Add Department":
-        inquirer.prompt(addDepartment).then((newDepartment) => {
-          fetch("/api/new-department", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(newDepartment),
-          })
-            .then((response) => response.json())
-            .then(() => {
-              //return to main prompt
-              inquirer.prompt(mainPrompt);
-            })
-            .catch((err) => {
-              console.error(`Error adding department:`, err);
+        (async() => {
+          try {
+            const newDepartment = await inquirer.prompt(addDepartment);
+            const response = await fetch("/api/new-department", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(newDepartment),
             });
-        });
+
+            if (!response.ok) {
+              throw new Error(`HTTP error: ${response.status}`);
+            }
+
+            await response.json();
+            await inquirer.prompt(mainPrompt);
+
+          } catch (err) {
+            console.error(`Error adding department:`, err);
+          }
+        })();
         break;
+
       case "Update Employee Role":
         (async() => {
           try {
@@ -179,7 +196,7 @@ inquirer.prompt(mainPrompt).then((answer) => {
               body: JSON.stringify(updatedEmpRole),
             });
 
-            if(!response.ok) {
+            if (!response.ok) {
               throw new Error(`HTTP error: ${response.status}`);
             }
 
@@ -190,6 +207,34 @@ inquirer.prompt(mainPrompt).then((answer) => {
             console.error(`Error updating employee role:`, err);
           }
         })();
+        break;
+
+      case "View All Employees":
+        (async() => {
+          try {
+            const response = await fetch("/api/view-employees", {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            });
+
+            if (!response.ok) {
+              throw new Error(`HTTP error: ${response.status}`);
+            }
+
+            await response.json();
+            await inquirer.prompt(mainPrompt);
+
+          } catch (err) {
+            console.error(`Error updating employee role:`, err);
+          }
+        })();
+      
+    }
+});
+
+
         // inquirer.prompt(updateRole).then((updatedEmpRole) => {
         //   fetch("/api/update-role", {
         //     method: "PUT",
@@ -207,15 +252,58 @@ inquirer.prompt(mainPrompt).then((answer) => {
         //       console.error(`Error updating employee role:`, err);
         //     });
         // });
-        break;
-    }
-});
 
-// case "Add Role":
-//             inquirer.prompt(addNewRole).then((newRole) => {
-//                 console.log(`Added`,newRole.newRoleName, `to the database`);
-//                 inquirer.prompt(mainPrompt);
-//             });
-//             break;
 
-// Update Employee Role
+        // inquirer.prompt(addDepartment).then((newDepartment) => {
+        //   fetch("/api/new-department", {
+        //     method: "POST",
+        //     headers: {
+        //       "Content-Type": "application/json",
+        //     },
+        //     body: JSON.stringify(newDepartment),
+        //   })
+        //     .then((response) => response.json())
+        //     .then(() => {
+        //       //return to main prompt
+        //       inquirer.prompt(mainPrompt);
+        //     })
+        //     .catch((err) => {
+        //       console.error(`Error adding department:`, err);
+        //     });
+        // });
+
+
+       // inquirer.prompt(addNewRole).then((newRole) => {
+        //   fetch("/api/new-role", {
+        //     method: "POST",
+        //     headers: {
+        //       "Content-Type": "application/json",
+        //     },
+        //     body: JSON.stringify(newRole),
+        //   })
+        //     .then((response) => response.json())
+        //     .then(() => {
+        //       //return to main prompt
+        //       inquirer.prompt(mainPrompt);
+        //     })
+        //     .catch((err) => {
+        //       console.error(`Error adding role:`, err);
+        //     });
+        // });
+     // inquirer.prompt(addNewEmployee).then((newEmployee) => {
+        //   fetch("/api/new-employee", {
+        //     method: "POST",
+        //     headers: {
+        //       "Content-Type": "application/json",
+        //     },
+        //     body: JSON.stringify(newEmployee),
+        //   })
+        //     .then((response) => response.json())
+        //     .then(() => {
+        //       //return to main prompt
+        //       inquirer.prompt(mainPrompt);
+        //     })
+        //     .catch((err) => {
+        //       console.error(`Error adding employee:`, err);
+        //     });
+        // });
