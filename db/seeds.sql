@@ -35,6 +35,7 @@ DO $$
         INSERT INTO manager (employee_id, full_name)
         VALUES
             (null, 'None');
+            
 
 
 RAISE NOTICE 'All tables have been updated.';

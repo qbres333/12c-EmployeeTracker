@@ -16,6 +16,7 @@ const app = express();
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
+
 const pool = new Pool(
   {
     user: process.env.PG_USER,
@@ -34,30 +35,56 @@ const pool = new Pool(
   })
 );
 
-// connect here
+// connect database here
 pool.connect();
 
-// database needs to be created before terminal prompt
+// view all employees
+app.get('/api/view-employees', ({ body }, res) => {
+    const sql = `SELECT * FROM employee`;
 
+    pool.query(sql, (err, { rows }) => {
+      if (err) {
+        res.status(500).json({ error: err.message });
+        return;
+      }
+      res.json({
+        message: "success",
+        data: rows,
+      });
+    });
+})
 
-// prompt in terminal
-const questions = [
-  {
-    type: "list",
-    message: "What would you like to do?",
-    name: "chooseOption",
-    choices: [
-      "Add Employee",
-      "Add Role",
-      "Add Department",
-      "Update Employee Role",
-      "View All Employees",
-      "View All Roles",
-      "View All Departments",
-      "Quit",
-    ],
-  },
-];
+// view all departments
+app.get("/api/view-depts", (req, res) => {
+  const sql = `SELECT * FROM department`;
+
+  pool.query(sql, (err, { rows }) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    res.json({
+      message: "success",
+      data: rows,
+    });
+  });
+});
+
+// view all roles
+app.get("/api/view-roles", (req, res) => {
+  const sql = `SELECT * FROM department`;
+
+  pool.query(sql, (err, { rows }) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    res.json({
+      message: "success",
+      data: rows,
+    });
+  });
+});
 
 
 
