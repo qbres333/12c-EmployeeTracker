@@ -37,7 +37,38 @@ const pool = new Pool(
 
 // connect database here
 // can I create the database from here?....
-pool.connect();
+pool.connect((err) => {
+    if(err) {
+        throw err; //stop execution if there's an error
+    }
+    // run the schema.sql file
+    fs.readFile('./db/schema.sql', 'utf8', (err, data) => {
+        if(err) {
+            throw err;
+        }
+        pool.query(data, (err, res) => {
+            if (err) {
+                throw err;
+            }
+            res.json('Schema created successfully')
+        })
+    });
+
+    // run the seeds.sql file
+    fs.readFile("./db/seeds.sql", "utf8", (err, data) => {
+      if (err) {
+        throw err;
+      }
+      pool.query(data, (err, res) => {
+        if (err) {
+          throw err;
+        }
+        res.json("Seeds inserted successfully");
+      });
+    });
+
+    
+});
 
 // view all employees joined with roles table
 app.get('/api/view-employees', ({ body }, res) => {

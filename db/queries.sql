@@ -5,25 +5,28 @@
 -- manager table does not need to be updated BUT:
     -- IF employee table has 2 more rows than the manager table, a new employee was 
     -- added. The MAX emp_id is the person to add to the manager table
--- add arguments to SELECT
--- INSERT INTO manager (employee_id, full_name)
+-- add arguments to SELECT or WHERE?
+-- INSERT INTO manager (employee_id, first_name, last_name)
 -- SELECT 
---     employee.emp_id,
---     CONCAT(employee.first_name, ' ', employee.last_name)
+--     employee.emp_id, employee.first_name, employee.last_name)
 -- FROM employee
--- WHERE employee.manager_id IS NOT NULL;
+-- WHERE ...
 
--- view all employees joined with emp_role table
+-- view all employees joined with emp_role, department, and manager tables
 SELECT employee.emp_id,
     employee.first_name,
     employee.last_name,
     emp_role.title,
-    emp_role.department_id,
+    department.dept_name,
     emp_role.salary,
-    employee.manager
+    CONCAT(manager.first_name, ' ', COALESCE(manager.last_name, '')) AS manager
 FROM employee
 JOIN emp_role
-ON employee.role_id = emp_role.role_id;
+ON employee.role_id = emp_role.role_id
+JOIN department
+ON emp_role.dept_id = department.dept_id
+LEFT JOIN manager
+ON employee.manager_id = manager.manager_id;
 
 -- view all roles
 SELECT * FROM emp_role;

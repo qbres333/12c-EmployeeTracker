@@ -10,7 +10,7 @@ DO $$
             (3, 'Legal'),
             (4, 'Sales');
 
-        INSERT INTO emp_role (role_id, title, salary, department_id)
+        INSERT INTO emp_role (role_id, title, salary, dept_id)
         VALUES
             (1, 'Sales Lead', '100000', 4),
             (2, 'Salesperson', '80000', 4),
@@ -22,27 +22,27 @@ DO $$
             (8, 'Lawyer', '190000', 3);
 
 
-        INSERT INTO manager (manager_id, employee_id, full_name)
+        INSERT INTO manager (manager_id, emp_id, first_name, last_name)
         VALUES
-            (1, null, 'None'),
-            (2, 1, "Jack Frost"),
-            (3, 2, "Michael Myers"),
-            (4, 3, "Pamela Voorhees"),
-            (5, 4, "Jamie Curtis"),
-            (6, 5, 'Danielle Harris'),
-            (7, 6, 'Angela Merkel'),
-            (8, 7, 'Sanna Marin'),
-            (9, 8, 'Joe Kabob');
-
+            (1, NULL, 'None', NULL),
+            (2, 1, 'Jack', 'Frost'),
+            (3, 2, 'Michael', 'Myers'),
+            (4, 3, 'Pamela', 'Voorhees'),
+            (5, 4, 'Jamie', 'Curtis'),
+            (6, 5, 'Danielle', 'Harris'),
+            (7, 6, 'Angela', 'Merkel'),
+            (8, 7, 'Sanna', 'Marin'),
+            (9, 8, 'Joe', 'Kabob');
+            
         INSERT INTO employee (emp_id, first_name, last_name, role_id, manager_id)
         VALUES
-            (1, 'Jack', 'Frost', 1, 1),
+            (1, 'Jack', 'Frost', 1, null),
             (2, 'Michael', 'Myers', 2, 2),
-            (3, 'Pamela', 'Voorhees', 3, 1),
+            (3, 'Pamela', 'Voorhees', 3, null),
             (4, 'Jamie', 'Curtis', 4, 4),
-            (5, 'Danielle', 'Harris', 5, 1),
+            (5, 'Danielle', 'Harris', 5, null),
             (6, 'Angela', 'Merkel', 6, 6),
-            (7, 'Sanna', 'Marin', 7, 1),
+            (7, 'Sanna', 'Marin', 7, null),
             (8, 'Joe', 'Kabob', 8, 4);
 
 

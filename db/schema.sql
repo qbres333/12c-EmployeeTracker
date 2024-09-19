@@ -20,9 +20,9 @@ CREATE TABLE department (
 CREATE TABLE emp_role (
     role_id SERIAL PRIMARY KEY,
     title VARCHAR(30) UNIQUE NOT NULL,
-    department_id INTEGER NOT NULL,
+    dept_id INTEGER NOT NULL,
     salary DECIMAL NOT NULL,
-    FOREIGN KEY department_id REFERENCES department(dept_id)
+    FOREIGN KEY dept_id REFERENCES department(dept_id)
     ON DELETE SET NULL
 );
 
@@ -30,9 +30,9 @@ CREATE TABLE emp_role (
 -- employees can have the same name, distinguish with emp_id
 CREATE TABLE manager (
     manager_id SERIAL PRIMARY KEY,
-    employee_id INTEGER,
+    emp_id INTEGER,
     full_name VARCHAR(61),
-    FOREIGN KEY (employee_id) REFERENCES employee(emp_id)
+    FOREIGN KEY (emp_id) REFERENCES employee(emp_id)
     ON DELETE SET NULL
 );
 
