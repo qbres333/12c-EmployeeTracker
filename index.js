@@ -86,6 +86,24 @@ app.get("/api/view-roles", (req, res) => {
 });
 
 // add new employee
+app.post('/api/new-employee', ({body}, res) => {
+  const sql = `INSERT INTO employee (first_name, last_name, role_id, manager_id)
+    VALUES ($1, $2, $3, $4)`;
+  // params collects data from the prompts
+  const params = [body.first_name, body.last_name, body.emp_role, body.empManager];
+
+  pool.query(sql, params, (err, result) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    res.json({
+      message: `Added ${body.first_name} ${body.last_name} to the database`,
+      data: body
+    })
+  })
+});
+
 // add new role
 // add new department
 // update employee role

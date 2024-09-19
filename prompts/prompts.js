@@ -19,7 +19,7 @@ const mainPrompt = [
       "View All Departments",
       "Quit", // pool.end();
     ],
-  }
+  },
 ];
 
 // new employee prompts
@@ -105,29 +105,117 @@ const updateRole = [
 
 // store the answers to the prompts. Write directly to database?
 
-
+// send collect prompt data to API endpoints
 
 inquirer.prompt(mainPrompt).then((answer) => {
     switch (answer.chooseOption) {
-        case "Add Employee":
-            inquirer.prompt(addNewEmployee).then((newEmployee) => {
-                console.log(
-                  `Added`,
-                  newEmployee.firstName,
-                  newEmployee.lastName,`to the database.`
-                );
-                //call main prompt here
-                inquirer.prompt(mainPrompt);
+      case "Add Employee":
+        inquirer.prompt(addNewEmployee).then((newEmployee) => {
+          fetch("/api/new-employee", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(newEmployee),
+          })
+            .then((response) => response.json())
+            .then(() => {
+              //return to main prompt
+              inquirer.prompt(mainPrompt);
+            })
+            .catch((err) => {
+              console.error(`Error adding employee:`, err);
             });
-            break;
+        });
+        break;
+      // add other cases
+      case "Add Role":
+        inquirer.prompt(addNewRole).then((newRole) => {
+          fetch("/api/new-role", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(newRole),
+          })
+            .then((response) => response.json())
+            .then(() => {
+              //return to main prompt
+              inquirer.prompt(mainPrompt);
+            })
+            .catch((err) => {
+              console.error(`Error adding role:`, err);
+            });
+        });
+        break;
+      case "Add Department":
+        inquirer.prompt(addDepartment).then((newDepartment) => {
+          fetch("/api/new-department", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(newDepartment),
+          })
+            .then((response) => response.json())
+            .then(() => {
+              //return to main prompt
+              inquirer.prompt(mainPrompt);
+            })
+            .catch((err) => {
+              console.error(`Error adding department:`, err);
+            });
+        });
+        break;
+      case "Update Employee Role":
+        (async() => {
+          try {
+            const updatedEmpRole = await inquirer.prompt(updateRole);
+            const response = await fetch("/api/update-role", {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(updatedEmpRole),
+            });
 
-        case "Add Role":
-            inquirer.prompt(addNewRole).then((newRole) => {
-                console.log(`Added`,newRole.newRoleName, `to the database`);
-                inquirer.prompt(mainPrompt);
-            });
-            break;
+            if(!response.ok) {
+              throw new Error(`HTTP error: ${response.status}`);
+            }
+
+            await response.json();
+            await inquirer.prompt(mainPrompt);
+
+          } catch (err) {
+            console.error(`Error updating employee role:`, err);
+          }
+        })();
+        // inquirer.prompt(updateRole).then((updatedEmpRole) => {
+        //   fetch("/api/update-role", {
+        //     method: "PUT",
+        //     headers: {
+        //       "Content-Type": "application/json",
+        //     },
+        //     body: JSON.stringify(updatedEmpRole),
+        //   })
+        //     .then((response) => response.json())
+        //     .then(() => {
+        //       //return to main prompt
+        //       inquirer.prompt(mainPrompt);
+        //     })
+        //     .catch((err) => {
+        //       console.error(`Error updating employee role:`, err);
+        //     });
+        // });
+        break;
     }
 });
 
+// case "Add Role":
+//             inquirer.prompt(addNewRole).then((newRole) => {
+//                 console.log(`Added`,newRole.newRoleName, `to the database`);
+//                 inquirer.prompt(mainPrompt);
+//             });
+//             break;
 
+// Update Employee Role
