@@ -87,6 +87,23 @@ const addDepartment = [
     name: "deptName",
   },
 ];
+
+// update employee role
+const updateRole = [
+  {
+    type: "list",
+    message: "Which employee's role do you want to update?",
+    name: "empName",
+    choices: [],
+  },
+  {
+    type: "list",
+    message: "Which role do you want to assign the selected employee?",
+    name: "updatedRole",
+    choices: [],
+  },
+];
+
 inquirer.prompt(mainPrompt).then((answer) => {
     switch (answer.chooseOption) {
         case "Add Employee":
@@ -106,6 +123,8 @@ inquirer.prompt(mainPrompt).then((answer) => {
                 console.log(`Added`,newRole.newRoleName, `to the database`);
                 inquirer.prompt(mainPrompt);
             });
+            break;
     }
 });
+
 
