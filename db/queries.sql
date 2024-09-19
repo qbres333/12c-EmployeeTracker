@@ -12,7 +12,7 @@
 -- FROM employee
 -- WHERE ...
 
--- view all employees joined with emp_role, department, and manager tables
+-- view all employees joined with emp_role, department, and managers tables
 SELECT employee.emp_id,
     employee.first_name,
     employee.last_name,

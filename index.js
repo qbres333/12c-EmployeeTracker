@@ -16,132 +16,26 @@ const app = express();
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
-// connect to the default postgres database before connecting to the real db
-// database must exist before connection
-const initialPool = new Pool({
-  user: process.env.PG_USER,
-  password: process.env.PG_PASSWORD,
-  host: process.env.PG_HOST,
-  database: "postgres",
-});
 
-// custom employee database
-const dbName = process.env.PG_DATABASE;
+const pool = new Pool(
+  {
+    user: process.env.PG_USER,
+    password: process.env.PG_PASSWORD,
+    host: process.env.PG_HOST,
+    database: process.env.PG_DATABASE,
+  },
 
-async function createDB() {
-    let client; // a client from the connection pool; used to interact with db for queries
-    try {
-        // connect to default postgres database
-        client = await initialPool.connect();
-
-        // create database
-        await client.query(`CREATE DATABASE ${dbName}`); //error: db exists
-    } catch (err) {
-        console.error('Error creating database', err);
-    } finally {
-      // release client back to the connection pool after database is created
-      if(client) {
-        client.release();
-      }
-      initialPool.end(); //close this connection to the db
+  figlet("Employee Database", (err, data) => {
+    if (err) {
+      console.log("Could not load image");
+      console.dir(err);
+      return;
     }
+    console.log(data);
+  })
+);
 
-    // connect to custom database
-    const pool = new Pool(
-      {
-        user: process.env.PG_USER,
-        password: process.env.PG_PASSWORD,
-        host: process.env.PG_HOST,
-        database: dbName,
-      },
-
-      figlet("Employee\n\nDatabase", (err, data) => {
-        if (err) {
-          console.log("Could not load image");
-          console.dir(err);
-          return;
-        }
-        console.log(data);
-      })
-    );
-
-    try {
-      client = await pool.connect();
-      // read schema file
-      const schema = await fs.readFile("../db/schema.sql", "utf8", (err,data) => {
-            if (err) {
-                console.error(err);
-                return;
-            }
-            console.log(data);
-      });
-      await client.query(schema);
-
-      // read seeds file
-      const seeds = await fs.readFile("../db/seeds.sql", "utf8", (err,data) => {
-        if (err) {
-            console.error(err);
-            return;
-        }
-        console.log(data);
-      });
-      await client.query(seeds);
-
-    } catch (err) {
-        console.error("Error creating database", err);
-    } finally {
-        if (client) {
-          client.release();
-        }
-    }
-
-};
-
-createDB();
-
-// const pool = new Pool(
-//   {
-//     user: process.env.PG_USER,
-//     password: process.env.PG_PASSWORD,
-//     host: process.env.PG_HOST,
-//     database: dbName,
-//   },
-
-//   figlet("Employee Database", (err, data) => {
-//     if (err) {
-//       console.log("Could not load image");
-//       console.dir(err);
-//       return;
-//     }
-//     console.log(data);
-//   })
-// );
-
-
-
-// // connect to actual database here, and build it
-// pool.connect(async (err, client, release) => {
-//     if(err) {
-//         console.error('Error connecting to the database', err);
-//         return;
-//     }
-//         try {
-//             // read schema file
-//             const schema = await fs.readFile("../db/schema.sql", "utf8");
-//             await client.query(schema);
-
-//             // read seeds file
-//             const seeds = await fs.readFile("../db/seeds.sql", "utf8");
-//             await client.query(seeds);
-
-//         } catch (error) {
-//             console.error('Error creating database', error)
-//         } finally {
-//           // release client back to the connection pool after database is created
-//           release();
-//         }
-//     }
-// );
+pool.connect();
 
 // view all employees joined with manager, role, department tables
 app.get("/api/view-employees", (req, res) => {
