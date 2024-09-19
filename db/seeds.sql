@@ -21,21 +21,29 @@ DO $$
             (7, 'Legal Team Lead', '250000', 3),
             (8, 'Lawyer', '190000', 3);
 
-        INSERT INTO employee (emp_id, first_name, last_name, role_id)
-        VALUES
-            (1, 'Jack', 'Frost', 1,),
-            (2, 'Michael', 'Myers', 2),
-            (3, 'Pamela', 'Voorhees', 3),
-            (4, 'Jamie', 'Curtis', 4),
-            (5, 'Danielle', 'Harris', 5),
-            (6, 'Angela', 'Merkel', 6),
-            (7, 'Sanna', 'Marin', 7),
-            (8, 'Joe', 'Kabob', 8);
 
-        INSERT INTO manager (employee_id, full_name)
+        INSERT INTO manager (manager_id, employee_id, full_name)
         VALUES
-            (null, 'None');
-            
+            (1, null, 'None'),
+            (2, 1, "Jack Frost"),
+            (3, 2, "Michael Myers"),
+            (4, 3, "Pamela Voorhees"),
+            (5, 4, "Jamie Curtis"),
+            (6, 5, 'Danielle Harris'),
+            (7, 6, 'Angela Merkel'),
+            (8, 7, 'Sanna Marin'),
+            (9, 8, 'Joe Kabob');
+
+        INSERT INTO employee (emp_id, first_name, last_name, role_id, manager_id)
+        VALUES
+            (1, 'Jack', 'Frost', 1, 1),
+            (2, 'Michael', 'Myers', 2, 2),
+            (3, 'Pamela', 'Voorhees', 3, 1),
+            (4, 'Jamie', 'Curtis', 4, 4),
+            (5, 'Danielle', 'Harris', 5, 1),
+            (6, 'Angela', 'Merkel', 6, 6),
+            (7, 'Sanna', 'Marin', 7, 1),
+            (8, 'Joe', 'Kabob', 8, 4);
 
 
 RAISE NOTICE 'All tables have been updated.';

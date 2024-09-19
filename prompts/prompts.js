@@ -39,15 +39,8 @@ const addNewEmployee = [
     message: "What is the employee's role?",
     name: "empRole",
     choices: [
-      //choices cannot be hard-coded since the database is dynamically updated
-      //   "Sales Lead",
-      //   "Salesperson",
-      //   "Lead Engineer",
-      //   "Software Engineer",
-      //   "Account Manager",
-      //   "Accountant",
-      //   "Legal Team Lead",
-      //   "Lawyer",
+      /*choices cannot be hard-coded since 
+      the database is dynamically updated */
     ],
   },
   {

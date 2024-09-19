@@ -30,7 +30,7 @@ CREATE TABLE emp_role (
 -- employees can have the same name, distinguish with emp_id
 CREATE TABLE manager (
     manager_id SERIAL PRIMARY KEY,
-    employee_id INTEGER, -- Can I insert a null value to the table if this foreign key is never null?
+    employee_id INTEGER,
     full_name VARCHAR(61),
     FOREIGN KEY (employee_id) REFERENCES employee(emp_id)
     ON DELETE SET NULL

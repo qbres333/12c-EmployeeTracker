@@ -36,11 +36,12 @@ const pool = new Pool(
 );
 
 // connect database here
+// can I create the database from here?....
 pool.connect();
 
-// view all employees
+// view all employees joined with roles table
 app.get('/api/view-employees', ({ body }, res) => {
-    const sql = `SELECT * FROM employee`;
+    const sql = ``;
 
     pool.query(sql, (err, { rows }) => {
       if (err) {
@@ -86,7 +87,10 @@ app.get("/api/view-roles", (req, res) => {
   });
 });
 
-
+// add new employee
+// add new role
+// add new department
+// 
 
 
 
