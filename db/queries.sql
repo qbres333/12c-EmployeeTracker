@@ -26,7 +26,8 @@ ON employee.role_id = emp_role.role_id
 JOIN department
 ON emp_role.dept_id = department.dept_id
 LEFT JOIN manager
-ON employee.manager_id = manager.manager_id;
+ON employee.manager_id = manager.manager_id
+ORDER BY emp_id ASC;
 
 -- view all roles
 SELECT * FROM emp_role;

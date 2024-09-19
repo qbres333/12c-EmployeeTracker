@@ -17,7 +17,7 @@ const mainPrompt = [
       "View All Employees",
       "View All Roles",
       "View All Departments",
-      "Quit", // connection.end();
+      "Quit", // pool.end();
     ],
   }
 ];
@@ -38,10 +38,8 @@ const addNewEmployee = [
     type: "list",
     message: "What is the employee's role?",
     name: "empRole",
-    choices: [
-      /*choices cannot be hard-coded since 
-      the database is dynamically updated */
-    ],
+    choices: [/*choices cannot be hard-coded since 
+      the database is dynamically updated */],
   },
   {
     type: "list",
@@ -103,6 +101,11 @@ const updateRole = [
     choices: [],
   },
 ];
+
+
+// store the answers to the prompts. Write directly to database?
+
+
 
 inquirer.prompt(mainPrompt).then((answer) => {
     switch (answer.chooseOption) {

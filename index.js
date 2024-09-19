@@ -39,7 +39,7 @@ pool.connect();
 
 // view all employees joined with manager, role, department tables
 app.get("/api/view-employees", (req, res) => {
-  const sql = `SELECT employee.emp_id, employee.first_name, employee.last_name, emp_role.title, department.dept_name, emp_role.salary, CONCAT(manager.first_name, ' ', COALESCE(manager.last_name, '')) AS manager FROM employee JOIN emp_role ON employee.role_id = emp_role.role_id JOIN department ON emp_role.dept_id = department.dept_id LEFT JOIN manager ON employee.manager_id = manager.manager_id`;
+  const sql = `SELECT employee.emp_id, employee.first_name, employee.last_name, emp_role.title, department.dept_name, emp_role.salary, CONCAT(manager.first_name, ' ', COALESCE(manager.last_name, '')) AS manager FROM employee JOIN emp_role ON employee.role_id = emp_role.role_id JOIN department ON emp_role.dept_id = department.dept_id LEFT JOIN manager ON employee.manager_id = manager.manager_id ORDER BY emp_id ASC`;
 
   pool.query(sql, (err, { rows }) => {
     if (err) {
