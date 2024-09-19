@@ -2,6 +2,37 @@ const inquirer = require("inquirer");
 const fs = require("fs");
 const path = require("path");
 
+// create functions to generate lists for prompts of type "list"
+async function roleList() {
+  try {
+    const list = await pool.query("SELECT title FROM emp_role");
+    return list.rows.map((row) => row.title);
+  } catch (err) {
+    console.error(`Error fetching role list:`, err);
+  }
+};
+
+//add "None" option that makes the manager field null in the employee table
+async function employeeList() {
+  try {
+    const list = await pool.query(
+      "SELECT CONCAT(first_name, ' ', last_name) AS full_name FROM employee"
+    );
+    return list.rows.map((row) => row.full_name);
+  } catch (err) {
+    console.error(`Error fetching employee list:`, err);
+  }
+};
+
+
+async function departmentList() {
+  try {
+    const list = await pool.query("SELECT dept_name FROM department");
+    return list.rows.map(row => row.dept_name);
+  } catch (err) {
+    console.error(`Error fetching department list:`, err);
+  }
+}; //
 
 // main prompt in terminal
 const mainPrompt = [
@@ -38,14 +69,13 @@ const addNewEmployee = [
     type: "list",
     message: "What is the employee's role?",
     name: "empRole",
-    choices: [/*choices cannot be hard-coded since 
-      the database is dynamically updated */],
+    choices: [], //dynamically generate list
   },
   {
     type: "list",
     message: "who is the employee's manager?",
     name: "empManager",
-    choices: [],
+    choices: [], //dynamically generate list
   },
 ];
 
@@ -73,7 +103,7 @@ const addNewRole = [
     type: "list",
     message: "What department does the role belong to?",
     name: "newRoleDept",
-    choices: [],
+    choices: [], //dynamically generate list
   },
 ];
 
@@ -92,20 +122,18 @@ const updateRole = [
     type: "list",
     message: "Which employee's role do you want to update?",
     name: "empName",
-    choices: [],
+    choices: [], //dynamically generate list
   },
   {
     type: "list",
     message: "Which role do you want to assign the selected employee?",
     name: "updatedRole",
-    choices: [],
+    choices: [], //dynamically generate list
   },
 ];
 
 
-// store the answers to the prompts. Write directly to database?
-
-// send collect prompt data to API endpoints
+// send collected prompt data to API endpoints
 
 inquirer.prompt(mainPrompt).then((answer) => {
     switch (answer.chooseOption) {
@@ -227,10 +255,68 @@ inquirer.prompt(mainPrompt).then((answer) => {
             await inquirer.prompt(mainPrompt);
 
           } catch (err) {
-            console.error(`Error updating employee role:`, err);
+            console.error(`Error fetching all employees:`, err);
           }
         })();
+        break;
+
+      case "View All Roles":
+        (async() => {
+          try {
+            const response = await fetch("/api/view-roles", {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            });
+
+            if (!response.ok) {
+              throw new Error(`HTTP error: ${response.status}`);
+            }
+
+            await response.json();
+            await inquirer.prompt(mainPrompt);
+
+          } catch (err) {
+            console.error(`Error fetching all roles:`, err);
+          }
+        })();
+        break;
+
+      case "View All Departments":
+        (async() => {
+          try {
+            const response = await fetch("/api/view-depts", {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            });
+
+            if (!response.ok) {
+              throw new Error(`HTTP error: ${response.status}`);
+            }
+
+            await response.json();
+            await inquirer.prompt(mainPrompt);
+
+          } catch (err) {
+            console.error(`Error fetching all departments:`, err);
+          }
+        })();
+        break;
       
+      default:
+        (async() => {
+          try {
+            const exitMessage = 'You have exited from the database.'
+            console.log(exitMessage);
+            await pool.end();
+          } catch (err) {
+            console.error(`Error exiting database:`, err);
+          }
+        })();
+              
     }
 });
 
