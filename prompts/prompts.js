@@ -61,7 +61,7 @@ const mainPrompt = [
 async function promptNewEmployee() {
   try {
     /* assign values of resolved promises from roleList and employeeList functions to roles, 
-    employees variables respectively */
+    employees respectively */
     const [roles, employees] = await Promise.all([roleList(), employeeList()]);
 
     const addNewEmployee = [
@@ -93,65 +93,100 @@ async function promptNewEmployee() {
     await inquirer.prompt(addNewEmployee);
 
   } catch(err) {
-    console.error("Error in 'New Employee' prompt:", err);
+    console.error("Error in 'New Employee' prompts:", err);
+  }
+};
+
+
+// new role prompts
+async function promptNewRole() {
+  try {
+    const [departments] = await Promise.all([departmentList()]);
+
+    const addNewRole = [
+      {
+        type: "input",
+        message: "What is the name of the role? ",
+        name: "newRoleName",
+      },
+      {
+        type: "list",
+        message: "What department does the role belong to?",
+        name: "newRoleDept",
+        choices: departments, //dynamically generate list
+      },
+      {
+        type: "input",
+        message: "What is the salary of the role? ",
+        name: "newRoleSalary",
+        validate: (input) => {
+          //check that the input is a number using isNAN
+          const isNumber = !isNaN(parseFloat(input));
+          if (!isNumber) {
+            return "Please enter a valid number";
+          }
+          return true;
+        },
+      },
+    ];
+
+    // prompt the user
+    await inquirer.prompt(addNewRole);
+
+  } catch (err) {
+    console.error("Error in 'New Role' prompts:", err);
+  }
+};
+
+
+// new department prompt
+async function promptNewDepartment() {
+  try {
+    const addDepartment = [
+      {
+        type: "input",
+        message: "What is the name of the department? ",
+        name: "deptName",
+      },
+    ];
+
+    // prompt the user
+    await inquirer.prompt(addDepartment);
+
+  } catch (err) {
+    console.error("Error in 'New Department' prompt:", err);
   }
 };
 
 
 
-
-// new role prompts
-const addNewRole = [
-  {
-    type: "input",
-    message: "What is the name of the role? ",
-    name: "newRoleName",
-  },
-  {
-    type: "input",
-    message: "What is the salary of the role? ",
-    name: "newRoleSalary",
-    validate: (input) => {
-      //check that the input is a number using isNAN
-      const isNumber = !isNaN(parseFloat(input));
-      if (!isNumber) {
-        return "Please enter a valid number";
-      }
-      return true;
-    },
-  },
-  {
-    type: "list",
-    message: "What department does the role belong to?",
-    name: "newRoleDept",
-    choices: [], //dynamically generate list
-  },
-];
-
-// new department prompt
-const addDepartment = [
-  {
-    type: "input",
-    message: "What is the name of the department? ",
-    name: "deptName",
-  },
-];
-
 // update employee role
-const updateRole = [
-  {
-    type: "list",
-    message: "Which employee's role do you want to update?",
-    name: "empName",
-    choices: [], //dynamically generate list
-  },
-  {
-    type: "list",
-    message: "Which role do you want to assign the selected employee?",
-    name: "updatedRole",
-    choices: [], //dynamically generate list
-  },
-];
+async function promptUpdateRole() {
+  try {
+    const [roles, employees] = await Promise.all([roleList(), employeeList()]);
+
+    const updateRole = [
+      {
+        type: "list",
+        message: "Which employee's role do you want to update?",
+        name: "empName",
+        choices: employees, //dynamically generate list
+      },
+      {
+        type: "list",
+        message: "Which role do you want to assign the selected employee?",
+        name: "updatedRole",
+        choices: roles, //dynamically generate list
+      },
+    ];
+
+    // prompt the user
+    await inquirer.prompt(updateRole);
+
+  } catch(err) {
+    console.error("Error in 'Update Role' prompts:", err);
+  }
+};
 
 
 // send collected prompt data to API endpoints
@@ -164,7 +199,7 @@ async function executePrompts() {
       case "Add Employee":
         (async () => {
           try {
-            const newEmployee = await inquirer.prompt(addNewEmployee);
+            const newEmployee = await promptNewEmployee();
             const response = await fetch("/api/new-employee", {
               method: "POST",
               headers: {
@@ -188,7 +223,7 @@ async function executePrompts() {
       case "Add Role":
         (async () => {
           try {
-            const newRole = await inquirer.prompt(addNewRole);
+            const newRole = await promptNewRole();
             const response = await fetch("/api/new-role", {
               method: "POST",
               headers: {
@@ -212,7 +247,7 @@ async function executePrompts() {
       case "Add Department":
         (async () => {
           try {
-            const newDepartment = await inquirer.prompt(addDepartment);
+            const newDepartment = await promptNewDepartment();
             const response = await fetch("/api/new-department", {
               method: "POST",
               headers: {
@@ -236,7 +271,7 @@ async function executePrompts() {
       case "Update Employee Role":
         (async () => {
           try {
-            const updatedEmpRole = await inquirer.prompt(updateRole);
+            const updatedEmpRole = await promptUpdateRole();
             const response = await fetch("/api/update-role", {
               method: "PUT",
               headers: {

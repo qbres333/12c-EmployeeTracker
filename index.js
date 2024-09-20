@@ -90,7 +90,7 @@ app.post('/api/new-employee', ({body}, res) => {
   const sql = `INSERT INTO employee (first_name, last_name, role_id, manager_id)
     VALUES ($1, $2, $3, $4)`;
   // params collects data from the prompts
-  const params = [body.first_name, body.last_name, body.emp_role, body.empManager];
+  const params = [body.firstName, body.lastName, body.empRole, body.empManager];
 
   pool.query(sql, params, (err, result) => {
     if (err) {
@@ -98,13 +98,31 @@ app.post('/api/new-employee', ({body}, res) => {
       return;
     }
     res.json({
-      message: `Added ${body.first_name} ${body.last_name} to the database`,
+      message: `success`,
       data: body
     })
   })
 });
 
 // add new role
+app.post("/api/new-role", ({ body }, res) => {
+  const sql = `INSERT INTO emp_role (title, dept_id, salary)
+    VALUES ($1, $2, $3)`;
+  // params collects data from the prompts
+  const params = [body.newRoleName, body.newRoleDept, body.newRoleSalary];
+
+  pool.query(sql, params, (err, result) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    res.json({
+      message: `success`,
+      data: body,
+    });
+  });
+});
+
 // add new department
 // update employee role
 
