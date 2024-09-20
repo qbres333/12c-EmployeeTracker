@@ -2,7 +2,8 @@ const inquirer = require("inquirer");
 const fs = require("fs");
 const path = require("path");
 
-// create functions to generate lists for prompts of type "list"
+// create functions to generate lists for prompts of type "list"; they all return promises
+// generate list of roles
 async function roleList() {
   try {
     const list = await pool.query("SELECT title FROM emp_role");
@@ -13,6 +14,7 @@ async function roleList() {
 };
 
 //add "None" option that makes the manager field null in the employee table
+// generate list of employees
 async function employeeList() {
   try {
     const list = await pool.query(
@@ -24,7 +26,7 @@ async function employeeList() {
   }
 };
 
-
+// generate department list
 async function departmentList() {
   try {
     const list = await pool.query("SELECT dept_name FROM department");
@@ -53,31 +55,50 @@ const mainPrompt = [
   },
 ];
 
+/* ------------- When do I call the non-main prompt functions?? --------- */
 // new employee prompts
-const addNewEmployee = [
-  {
-    type: "input",
-    message: "Enter the employee's first name: ",
-    name: "firstName",
-  },
-  {
-    type: "input",
-    message: "Enter the employee's last name",
-    name: "lastName",
-  },
-  {
-    type: "list",
-    message: "What is the employee's role?",
-    name: "empRole",
-    choices: [], //dynamically generate list
-  },
-  {
-    type: "list",
-    message: "who is the employee's manager?",
-    name: "empManager",
-    choices: [], //dynamically generate list
-  },
-];
+// convert to async/await
+async function promptNewEmployee() {
+  try {
+    /* assign values of resolved promises from roleList and employeeList functions to roles, 
+    employees variables respectively */
+    const [roles, employees] = await Promise.all([roleList(), employeeList()]);
+
+    const addNewEmployee = [
+      {
+        type: "input",
+        message: "Enter the employee's first name: ",
+        name: "firstName",
+      },
+      {
+        type: "input",
+        message: "Enter the employee's last name",
+        name: "lastName",
+      },
+      {
+        type: "list",
+        message: "What is the employee's role?",
+        name: "empRole",
+        choices: roles, //dynamically generate list
+      },
+      {
+        type: "list",
+        message: "who is the employee's manager?",
+        name: "empManager",
+        choices: employees, //dynamically generate list
+      },
+    ];
+
+    // prompt the user
+    await inquirer.prompt(addNewEmployee);
+
+  } catch(err) {
+    console.error("Error in 'New Employee' prompt:", err);
+  }
+};
+
+
+
 
 // new role prompts
 const addNewRole = [
