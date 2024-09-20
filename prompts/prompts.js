@@ -134,11 +134,14 @@ const updateRole = [
 
 
 // send collected prompt data to API endpoints
+async function executePrompts() {
+  try {
+    const answer = await inquirer.prompt(mainPrompt);
 
-inquirer.prompt(mainPrompt).then((answer) => {
+    // switch/cases here
     switch (answer.chooseOption) {
       case "Add Employee":
-        (async() => {
+        (async () => {
           try {
             const newEmployee = await inquirer.prompt(addNewEmployee);
             const response = await fetch("/api/new-employee", {
@@ -154,8 +157,7 @@ inquirer.prompt(mainPrompt).then((answer) => {
             }
 
             await response.json();
-            await inquirer.prompt(mainPrompt);
-
+            
           } catch (err) {
             console.error(`Error adding role:`, err);
           }
@@ -163,7 +165,7 @@ inquirer.prompt(mainPrompt).then((answer) => {
         break;
 
       case "Add Role":
-        (async() => {
+        (async () => {
           try {
             const newRole = await inquirer.prompt(addNewRole);
             const response = await fetch("/api/new-role", {
@@ -179,8 +181,7 @@ inquirer.prompt(mainPrompt).then((answer) => {
             }
 
             await response.json();
-            await inquirer.prompt(mainPrompt);
-
+            
           } catch (err) {
             console.error(`Error adding role:`, err);
           }
@@ -188,7 +189,7 @@ inquirer.prompt(mainPrompt).then((answer) => {
         break;
 
       case "Add Department":
-        (async() => {
+        (async () => {
           try {
             const newDepartment = await inquirer.prompt(addDepartment);
             const response = await fetch("/api/new-department", {
@@ -204,8 +205,7 @@ inquirer.prompt(mainPrompt).then((answer) => {
             }
 
             await response.json();
-            await inquirer.prompt(mainPrompt);
-
+            
           } catch (err) {
             console.error(`Error adding department:`, err);
           }
@@ -213,7 +213,7 @@ inquirer.prompt(mainPrompt).then((answer) => {
         break;
 
       case "Update Employee Role":
-        (async() => {
+        (async () => {
           try {
             const updatedEmpRole = await inquirer.prompt(updateRole);
             const response = await fetch("/api/update-role", {
@@ -229,8 +229,7 @@ inquirer.prompt(mainPrompt).then((answer) => {
             }
 
             await response.json();
-            await inquirer.prompt(mainPrompt);
-
+            
           } catch (err) {
             console.error(`Error updating employee role:`, err);
           }
@@ -238,7 +237,7 @@ inquirer.prompt(mainPrompt).then((answer) => {
         break;
 
       case "View All Employees":
-        (async() => {
+        (async () => {
           try {
             const response = await fetch("/api/view-employees", {
               method: "GET",
@@ -252,8 +251,7 @@ inquirer.prompt(mainPrompt).then((answer) => {
             }
 
             await response.json();
-            await inquirer.prompt(mainPrompt);
-
+            
           } catch (err) {
             console.error(`Error fetching all employees:`, err);
           }
@@ -261,7 +259,7 @@ inquirer.prompt(mainPrompt).then((answer) => {
         break;
 
       case "View All Roles":
-        (async() => {
+        (async () => {
           try {
             const response = await fetch("/api/view-roles", {
               method: "GET",
@@ -275,8 +273,7 @@ inquirer.prompt(mainPrompt).then((answer) => {
             }
 
             await response.json();
-            await inquirer.prompt(mainPrompt);
-
+            
           } catch (err) {
             console.error(`Error fetching all roles:`, err);
           }
@@ -284,7 +281,7 @@ inquirer.prompt(mainPrompt).then((answer) => {
         break;
 
       case "View All Departments":
-        (async() => {
+        (async () => {
           try {
             const response = await fetch("/api/view-depts", {
               method: "GET",
@@ -298,27 +295,40 @@ inquirer.prompt(mainPrompt).then((answer) => {
             }
 
             await response.json();
-            await inquirer.prompt(mainPrompt);
 
           } catch (err) {
             console.error(`Error fetching all departments:`, err);
           }
         })();
         break;
-      
+
       default:
-        (async() => {
+        (async () => {
           try {
-            const exitMessage = 'You have exited from the database.'
+            const exitMessage = "You have exited from the database.";
             console.log(exitMessage);
             await pool.end();
           } catch (err) {
             console.error(`Error exiting database:`, err);
           }
         })();
-              
     }
-});
+
+    if(answer.chooseOption !== "Quit") {
+      await executePrompts();
+    }
+  } catch (err) {
+    console.error("Error executing prompts:", err);
+  }
+};
+
+// call prompts function
+executePrompts();
+
+// remove "await inquirer.prompt(mainPrompt);" from each case
+// inquirer.prompt(mainPrompt).then((answer) => {
+    
+// });
 
 
         // inquirer.prompt(updateRole).then((updatedEmpRole) => {
