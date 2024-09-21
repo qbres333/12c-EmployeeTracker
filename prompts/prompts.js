@@ -1,8 +1,6 @@
 const inquirer = require("inquirer");
-const fs = require("fs");
-const path = require("path");
 
-// create functions to generate lists for prompts of type "list"; they all return promises
+// create functions to generate lists for prompts of type "list"
 // generate list of roles from the emp_role table
 async function roleList() {
   try {
@@ -299,13 +297,16 @@ async function executePrompts() {
         (async () => {
           try {
             const newEmployee = await promptNewEmployee();
-            const response = await fetch("/api/new-employee", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify(newEmployee),
-            });
+            const response = await fetch(
+              "http://localhost:3001/api/new-employee",
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify(newEmployee),
+              }
+            );
 
             if (!response.ok) {
               throw new Error(`HTTP error: ${response.status}`);
@@ -326,7 +327,7 @@ async function executePrompts() {
         (async () => {
           try {
             const newRole = await promptNewRole();
-            const response = await fetch("/api/new-role", {
+            const response = await fetch("http://localhost:3001/api/new-role", {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
@@ -351,13 +352,16 @@ async function executePrompts() {
         (async () => {
           try {
             const newDepartment = await promptNewDepartment();
-            const response = await fetch("/api/new-department", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify(newDepartment),
-            });
+            const response = await fetch(
+              "http://localhost:3001/api/new-department",
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify(newDepartment),
+              }
+            );
 
             if (!response.ok) {
               throw new Error(`HTTP error: ${response.status}`);
@@ -376,13 +380,16 @@ async function executePrompts() {
         (async () => {
           try {
             const updatedEmpRole = await promptUpdateRole();
-            const response = await fetch("/api/update-role", {
-              method: "PUT",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify(updatedEmpRole),
-            });
+            const response = await fetch(
+              "http://localhost:3001/api/update-role",
+              {
+                method: "PUT",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify(updatedEmpRole),
+              }
+            );
 
             if (!response.ok) {
               throw new Error(`HTTP error: ${response.status}`);
@@ -400,12 +407,15 @@ async function executePrompts() {
       case "View All Employees":
         (async () => {
           try {
-            const response = await fetch("/api/view-employees", {
-              method: "GET",
-              headers: {
-                "Content-Type": "application/json",
-              },
-            });
+            const response = await fetch(
+              "http://localhost:3001/api/view-employees",
+              {
+                method: "GET",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+              }
+            );
 
             if (!response.ok) {
               throw new Error(`HTTP error: ${response.status}`);
@@ -422,12 +432,15 @@ async function executePrompts() {
       case "View All Roles":
         (async () => {
           try {
-            const response = await fetch("/api/view-roles", {
-              method: "GET",
-              headers: {
-                "Content-Type": "application/json",
-              },
-            });
+            const response = await fetch(
+              "http://localhost:3001/api/view-roles",
+              {
+                method: "GET",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+              }
+            );
 
             if (!response.ok) {
               throw new Error(`HTTP error: ${response.status}`);
@@ -444,12 +457,15 @@ async function executePrompts() {
       case "View All Departments":
         (async () => {
           try {
-            const response = await fetch("/api/view-depts", {
-              method: "GET",
-              headers: {
-                "Content-Type": "application/json",
-              },
-            });
+            const response = await fetch(
+              "http://localhost:3001/api/view-depts",
+              {
+                method: "GET",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+              }
+            );
 
             if (!response.ok) {
               throw new Error(`HTTP error: ${response.status}`);
@@ -484,4 +500,15 @@ async function executePrompts() {
 };
 
 // call prompts function
-executePrompts();
+// executePrompts();
+
+module.exports = {
+  roleList,
+  employeeList,
+  departmentList,
+  promptNewEmployee,
+  promptNewRole,
+  promptNewDepartment,
+  promptUpdateRole,
+  executePrompts,
+};

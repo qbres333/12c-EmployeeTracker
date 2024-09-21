@@ -7,6 +7,17 @@ const fs = require("fs");
 const path = require("path");
 const figlet = require("figlet");
 const { Pool } = require("pg");
+// import prompts file
+const {
+  roleList,
+  employeeList,
+  departmentList,
+  promptNewEmployee,
+  promptNewRole,
+  promptNewDepartment,
+  promptUpdateRole,
+  executePrompts,
+} = require("./prompts/prompts"); 
 
 // allow app to run on different ports
 const PORT = process.env.PORT || 3001;
@@ -32,10 +43,15 @@ const pool = new Pool(
       return;
     }
     console.log(data);
-  })
+    // Start the prompts after displaying the ascii art
+    executePrompts();
+  }),
+  
 );
 
+
 pool.connect();
+
 
 // view all employees joined with manager, role, department tables
 app.get("/api/view-employees", (req, res) => {
