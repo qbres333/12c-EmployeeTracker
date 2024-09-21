@@ -1,16 +1,17 @@
 const inquirer = require("inquirer");
 
-// create functions to generate lists for prompts of type "list"
+/* ------------------- create functions to generate lists for prompts of type "list" ----------------------- */
 // generate list of roles from the emp_role table
 async function roleList() {
   try {
     // retrieve id and title, but only list the titles. Can the id be used when saving to the database?
     const list = await pool.query("SELECT role_id, title FROM emp_role");
-    const roles = list.rows.map((row) => ({
-      role_id: row.role_id,
-      title: row.title,
-    }));
-    return roles;
+    // const roles = list.rows.map((row) => ({
+    //   role_id: row.role_id,
+    //   title: row.title,
+    // }));
+    // return roles;
+    return list.rows;
 
   } catch (err) {
     console.error(`Error fetching role list:`, err);
@@ -24,11 +25,12 @@ async function employeeList() {
     const list = await pool.query(
       "SELECT emp_id, CONCAT(first_name, ' ', last_name) AS full_name FROM employee"
     );
-    const employees = list.rows.map((row) => ({
-      emp_id: row.emp_id,
-      full_name: row.full_name,
-    }));
-    return employees;
+    // const employees = list.rows.map((row) => ({
+    //   emp_id: row.emp_id,
+    //   full_name: row.full_name,
+    // }));
+    // return employees;
+    return list.rows;
   
   } catch (err) {
     console.error(`Error fetching employee list:`, err);
@@ -39,11 +41,12 @@ async function employeeList() {
 async function departmentList() {
   try {
     const list = await pool.query("SELECT dept_id, dept_name FROM department");
-    const departments = list.rows.map(row => ({
-      dept_id: row.dept_id,
-      dept_name: row.dept_name,
-    }));
-    return departments;
+    // const departments = list.rows.map(row => ({
+    //   dept_id: row.dept_id,
+    //   dept_name: row.dept_name,
+    // }));
+    // return departments;
+    return list.rows;
 
   } catch (err) {
     console.error(`Error fetching department list:`, err);
@@ -147,13 +150,13 @@ async function promptNewEmployee() {
   }
 };
 
-
+/** --------------------------------------------- all prompts --------------------------------------------- */
 // new role prompts 
 async function promptNewRole() {
   try {
     const departments = await departmentList();
     // map departments to choices for prompt; name displays to user, id is stored
-    const dChoices = departments.map((dept) => ({
+    const dChoices = await departments.map((dept) => ({
       name: dept.dept_name,
       value: dept.dept_id,
     }));
@@ -286,7 +289,7 @@ async function promptUpdateRole() {
 };
 
 
-// send collected prompt data to API endpoints
+/** ------------------------------ send collected prompt data to API endpoints ---------------------------- */
 async function executePrompts() {
   try {
     const answer = await inquirer.prompt(mainPrompt);
@@ -500,15 +503,15 @@ async function executePrompts() {
 };
 
 // call prompts function
-// executePrompts();
+executePrompts();
 
-module.exports = {
-  roleList,
-  employeeList,
-  departmentList,
-  promptNewEmployee,
-  promptNewRole,
-  promptNewDepartment,
-  promptUpdateRole,
-  executePrompts,
-};
+// module.exports = {
+//   roleList,
+//   employeeList,
+//   departmentList,
+//   promptNewEmployee,
+//   promptNewRole,
+//   promptNewDepartment,
+//   promptUpdateRole,
+//   executePrompts,
+// };

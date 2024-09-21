@@ -30,7 +30,10 @@ ON employee.manager_id = manager.manager_id
 ORDER BY emp_id ASC;
 
 -- view all roles
-SELECT * FROM emp_role;
+SELECT emp_role.role_id, emp_role.title, department.dept_name, emp_role.salary 
+FROM emp_role
+JOIN department ON emp_role.dept_id = department.dept_id;
+
 
 -- view all departments
 SELECT * FROM department;
