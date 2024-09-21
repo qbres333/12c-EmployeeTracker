@@ -6,7 +6,8 @@ const path = require("path");
 // generate list of roles
 async function roleList() {
   try {
-    const list = await pool.query("SELECT title FROM emp_role");
+    // retrieve id and title, but only list the titles. Can the id be used when saving to the database?
+    const list = await pool.query("SELECT role_id, title FROM emp_role");
     return list.rows.map((row) => row.title);
   } catch (err) {
     console.error(`Error fetching role list:`, err);
@@ -18,7 +19,7 @@ async function roleList() {
 async function employeeList() {
   try {
     const list = await pool.query(
-      "SELECT CONCAT(first_name, ' ', last_name) AS full_name FROM employee"
+      "SELECT emp_id, CONCAT(first_name, ' ', last_name) AS full_name FROM employee"
     );
     return list.rows.map((row) => row.full_name);
   } catch (err) {
@@ -29,14 +30,14 @@ async function employeeList() {
 // generate department list
 async function departmentList() {
   try {
-    const list = await pool.query("SELECT dept_name FROM department");
+    const list = await pool.query("SELECT dept_id, dept_name FROM department");
     return list.rows.map(row => row.dept_name);
   } catch (err) {
     console.error(`Error fetching department list:`, err);
   }
 }; //
 
-// main prompt in terminal
+// main prompt in terminal;
 const mainPrompt = [
   {
     type: "list",
@@ -50,14 +51,12 @@ const mainPrompt = [
       "View All Employees",
       "View All Roles",
       "View All Departments",
-      "Quit", // pool.end();
+      "Quit", // pool.end(); test that this is the default case
     ],
   },
 ];
 
-/* ------------- When do I call the non-main prompt functions?? --------- */
-// new employee prompts
-// convert to async/await
+// new employee prompts   ADD TEXT VALIDATION
 async function promptNewEmployee() {
   try {
     /* assign values of resolved promises from roleList and employeeList functions to roles, 
@@ -78,19 +77,26 @@ async function promptNewEmployee() {
       {
         type: "list",
         message: "What is the employee's role?",
-        name: "empRole",
+        name: "empRole", //this needs to save to the DB as an id
         choices: roles, //dynamically generate list
       },
       {
         type: "list",
         message: "who is the employee's manager?",
-        name: "empManager",
+        name: "empManager", //this needs to save to the DB as an id
         choices: employees, //dynamically generate list
       },
     ];
 
     // prompt the user
-    await inquirer.prompt(addNewEmployee);
+    const answers = await inquirer.prompt(addNewEmployee);
+    // save responses in an object
+    return {
+      firstName: answers.firstName,
+      lastName: answers.lastName,
+      empRole: answers.empRole, //this is now role id
+      empManager: answers.empManager, //this is now managerid
+    };
 
   } catch(err) {
     console.error("Error in 'New Employee' prompts:", err);
@@ -98,7 +104,7 @@ async function promptNewEmployee() {
 };
 
 
-// new role prompts
+// new role prompts   ADD TEXT VALIDATION
 async function promptNewRole() {
   try {
     const [departments] = await Promise.all([departmentList()]);
@@ -112,7 +118,7 @@ async function promptNewRole() {
       {
         type: "list",
         message: "What department does the role belong to?",
-        name: "newRoleDept",
+        name: "newRoleDept", //must be role id
         choices: departments, //dynamically generate list
       },
       {
@@ -131,7 +137,13 @@ async function promptNewRole() {
     ];
 
     // prompt the user
-    await inquirer.prompt(addNewRole);
+    const answers = await inquirer.prompt(addNewRole);
+   
+    return {
+      newRoleName: answers.newRoleName,
+      newRoleDept: answers.newRoleDept, //body.selectedDepartment seems to not work
+      newRoleSalary: answers.newRoleSalary,
+    };
 
   } catch (err) {
     console.error("Error in 'New Role' prompts:", err);
@@ -139,7 +151,7 @@ async function promptNewRole() {
 };
 
 
-// new department prompt
+// new department prompt   ADD TEXT VALIDATION
 async function promptNewDepartment() {
   try {
     const addDepartment = [
@@ -157,7 +169,6 @@ async function promptNewDepartment() {
     console.error("Error in 'New Department' prompt:", err);
   }
 };
-
 
 
 // update employee role
@@ -380,82 +391,3 @@ async function executePrompts() {
 
 // call prompts function
 executePrompts();
-
-// remove "await inquirer.prompt(mainPrompt);" from each case
-// inquirer.prompt(mainPrompt).then((answer) => {
-    
-// });
-
-
-        // inquirer.prompt(updateRole).then((updatedEmpRole) => {
-        //   fetch("/api/update-role", {
-        //     method: "PUT",
-        //     headers: {
-        //       "Content-Type": "application/json",
-        //     },
-        //     body: JSON.stringify(updatedEmpRole),
-        //   })
-        //     .then((response) => response.json())
-        //     .then(() => {
-        //       //return to main prompt
-        //       inquirer.prompt(mainPrompt);
-        //     })
-        //     .catch((err) => {
-        //       console.error(`Error updating employee role:`, err);
-        //     });
-        // });
-
-
-        // inquirer.prompt(addDepartment).then((newDepartment) => {
-        //   fetch("/api/new-department", {
-        //     method: "POST",
-        //     headers: {
-        //       "Content-Type": "application/json",
-        //     },
-        //     body: JSON.stringify(newDepartment),
-        //   })
-        //     .then((response) => response.json())
-        //     .then(() => {
-        //       //return to main prompt
-        //       inquirer.prompt(mainPrompt);
-        //     })
-        //     .catch((err) => {
-        //       console.error(`Error adding department:`, err);
-        //     });
-        // });
-
-
-       // inquirer.prompt(addNewRole).then((newRole) => {
-        //   fetch("/api/new-role", {
-        //     method: "POST",
-        //     headers: {
-        //       "Content-Type": "application/json",
-        //     },
-        //     body: JSON.stringify(newRole),
-        //   })
-        //     .then((response) => response.json())
-        //     .then(() => {
-        //       //return to main prompt
-        //       inquirer.prompt(mainPrompt);
-        //     })
-        //     .catch((err) => {
-        //       console.error(`Error adding role:`, err);
-        //     });
-        // });
-     // inquirer.prompt(addNewEmployee).then((newEmployee) => {
-        //   fetch("/api/new-employee", {
-        //     method: "POST",
-        //     headers: {
-        //       "Content-Type": "application/json",
-        //     },
-        //     body: JSON.stringify(newEmployee),
-        //   })
-        //     .then((response) => response.json())
-        //     .then(() => {
-        //       //return to main prompt
-        //       inquirer.prompt(mainPrompt);
-        //     })
-        //     .catch((err) => {
-        //       console.error(`Error adding employee:`, err);
-        //     });
-        // });

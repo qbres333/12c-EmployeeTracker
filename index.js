@@ -47,7 +47,7 @@ app.get("/api/view-employees", (req, res) => {
       return;
     }
     res.json({
-      message: "success",
+      message: "GET successful",
       data: rows,
     });
   });
@@ -63,7 +63,7 @@ app.get("/api/view-depts", (req, res) => {
       return;
     }
     res.json({
-      message: "success",
+      message: "GET successful",
       data: rows,
     });
   });
@@ -79,7 +79,7 @@ app.get("/api/view-roles", (req, res) => {
       return;
     }
     res.json({
-      message: "success",
+      message: "GET successful",
       data: rows,
     });
   });
@@ -98,7 +98,7 @@ app.post('/api/new-employee', ({body}, res) => {
       return;
     }
     res.json({
-      message: `success`,
+      message: `POST successful`,
       data: body
     })
   })
@@ -117,13 +117,31 @@ app.post("/api/new-role", ({ body }, res) => {
       return;
     }
     res.json({
-      message: `success`,
+      message: `POST successful`,
       data: body,
     });
   });
 });
 
 // add new department
+app.post("/api/new-department", ({ body }, res) => {
+  const sql = `INSERT INTO department (dept_name)
+    VALUES ($1)`;
+  // params collects data from the prompts
+  const params = [body.deptName];
+
+  pool.query(sql, params, (err, result) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    res.json({
+      message: `POST successful`,
+      data: body,
+    });
+  });
+});
+
 // update employee role
 
 
