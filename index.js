@@ -125,8 +125,7 @@ app.post("/api/new-role", ({ body }, res) => {
 
 // add new department
 app.post("/api/new-department", ({ body }, res) => {
-  const sql = `INSERT INTO department (dept_name)
-    VALUES ($1)`;
+  const sql = `INSERT INTO department (dept_name) VALUES ($1)`;
   // params collects data from the prompts
   const params = [body.deptName];
 
@@ -143,25 +142,25 @@ app.post("/api/new-department", ({ body }, res) => {
 });
 
 // update employee role  /api/update-role
-app.put("/api/update-role/:id", (req, res) => {
-  const sql = `UPDATE employee SET role_id = $1 WHERE role_id = $2`;
+app.put("/api/update-role/", ({ body }, res) => {
+  const sql = `UPDATE employee SET role_id = $1 WHERE emp_id = $2`;
   // params collects data from the prompts
-  const params = [req.body.role_id];
+  const params = [body.updatedRole, body.empName];
 
   pool.query(sql, params, (err, result) => {
     if (err) {
       res.status(500).json({ error: err.message });
-      return;
+    } else if (!result.rowCount) {
+      res.json({message: "Employee not found!"})
+    } else {
+      res.json({
+        message: `Update (PUT) successful`,
+        data: body,
+        changes: result.rowCount
+      });
     }
-    res.json({
-      message: `POST successful`,
-      data: body,
-    });
   });
 });
-
-
-
 
 
 // Default response for any other request (Not Found)

@@ -71,7 +71,7 @@ const mainPrompt = [
   },
 ];
 
-// new employee prompts   ADD TEXT VALIDATION
+// new employee prompts 
 async function promptNewEmployee() {
   try {
     // store function calls in variables
@@ -94,7 +94,6 @@ async function promptNewEmployee() {
       name: "None",
       value: null
     })
-
 
     const addNewEmployee = [
       {
@@ -313,6 +312,9 @@ async function executePrompts() {
             }
 
             await response.json();
+            console.log(
+              `Added ${newEmployee.firstName} ${newEmployee.lastName} to the database`
+            );
             
           } catch (err) {
             console.error(`Error adding employee:`, err);
@@ -337,6 +339,7 @@ async function executePrompts() {
             }
 
             await response.json();
+            console.log(`Added ${newRole.newRoleName} to the database`)
             
           } catch (err) {
             console.error(`Error adding role:`, err);
@@ -361,6 +364,7 @@ async function executePrompts() {
             }
 
             await response.json();
+            console.log(`Added ${newDepartment.deptName} to the database`);
             
           } catch (err) {
             console.error(`Error adding department:`, err);
@@ -385,6 +389,7 @@ async function executePrompts() {
             }
 
             await response.json();
+            console.log(`Updated employee's role`);
             
           } catch (err) {
             console.error(`Error updating employee role:`, err);
