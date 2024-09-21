@@ -3,35 +3,50 @@ const fs = require("fs");
 const path = require("path");
 
 // create functions to generate lists for prompts of type "list"; they all return promises
-// generate list of roles
+// generate list of roles from the emp_role table
 async function roleList() {
   try {
     // retrieve id and title, but only list the titles. Can the id be used when saving to the database?
     const list = await pool.query("SELECT role_id, title FROM emp_role");
-    return list.rows.map((row) => row.title);
+    const roles = list.rows.map((row) => ({
+      role_id: row.role_id,
+      title: row.title,
+    }));
+    return roles;
+
   } catch (err) {
     console.error(`Error fetching role list:`, err);
   }
 };
 
 //add "None" option that makes the manager field null in the employee table
-// generate list of employees
+// generate list of employees from the employee table
 async function employeeList() {
   try {
     const list = await pool.query(
       "SELECT emp_id, CONCAT(first_name, ' ', last_name) AS full_name FROM employee"
     );
-    return list.rows.map((row) => row.full_name);
+    const employees = list.rows.map((row) => ({
+      emp_id: row.emp_id,
+      full_name: row.full_name,
+    }));
+    return employees;
+  
   } catch (err) {
     console.error(`Error fetching employee list:`, err);
   }
 };
 
-// generate department list
+// generate department list from the department table
 async function departmentList() {
   try {
     const list = await pool.query("SELECT dept_id, dept_name FROM department");
-    return list.rows.map(row => row.dept_name);
+    const departments = list.rows.map(row => ({
+      dept_id: row.dept_id,
+      dept_name: row.dept_name,
+    }));
+    return departments;
+
   } catch (err) {
     console.error(`Error fetching department list:`, err);
   }
@@ -59,43 +74,75 @@ const mainPrompt = [
 // new employee prompts   ADD TEXT VALIDATION
 async function promptNewEmployee() {
   try {
-    /* assign values of resolved promises from roleList and employeeList functions to roles, 
-    employees respectively */
-    const [roles, employees] = await Promise.all([roleList(), employeeList()]);
+    // store function calls in variables
+    const roles = await roleList();
+    const employees = await employeeList();
+
+    /* map roles to choices for the prompt; the name is displayed to the user, 
+    the value (id) is returned/saved to the DB */
+    const rChoices = roles.map((role) => ({
+      name: role.title,
+      value: role.role_id,
+    }));
+    
+    const eChoices = employees.map((emp) => ({
+      name: emp.full_name,
+      value: emp.emp_id,
+    }));
+    // add "None" option for new employees without managers
+    eChoices.push({
+      name: "None",
+      value: null
+    })
+
 
     const addNewEmployee = [
       {
         type: "input",
         message: "Enter the employee's first name: ",
         name: "firstName",
+        validate: (input) => {
+          const isText = /^[a-zA-Z]{1,30}$/;
+          if (!isText.test(input)) {
+            return "Employee name must contain only letters and be less than 30 characters long.";
+          }
+          return true;
+        },
       },
       {
         type: "input",
         message: "Enter the employee's last name",
         name: "lastName",
+        validate: (input) => {
+          const isText = /^[a-zA-Z]{1,30}$/;
+          if (!isText.test(input)) {
+            return "Employee name must contain only letters and be less than 30 characters long.";
+          }
+          return true;
+        },
       },
       {
         type: "list",
         message: "What is the employee's role?",
-        name: "empRole", //this needs to save to the DB as an id
-        choices: roles, //dynamically generate list
+        name: "empRole",
+        choices: rChoices, //dynamically generate list
       },
       {
         type: "list",
         message: "who is the employee's manager?",
-        name: "empManager", //this needs to save to the DB as an id
-        choices: employees, //dynamically generate list
+        name: "empManager",
+        choices: eChoices, //dynamically generate list
       },
     ];
 
     // prompt the user
     const answers = await inquirer.prompt(addNewEmployee);
-    // save responses in an object
+    // return answers in an object
     return {
       firstName: answers.firstName,
       lastName: answers.lastName,
-      empRole: answers.empRole, //this is now role id
-      empManager: answers.empManager, //this is now managerid
+      empRole: answers.empRole, //this is the role id
+      empManager: answers.empManager, //this is the manager id
     };
 
   } catch(err) {
@@ -104,22 +151,35 @@ async function promptNewEmployee() {
 };
 
 
-// new role prompts   ADD TEXT VALIDATION
+// new role prompts 
 async function promptNewRole() {
   try {
-    const [departments] = await Promise.all([departmentList()]);
+    const departments = await departmentList();
+    // map departments to choices for prompt; name displays to user, id is stored
+    const dChoices = departments.map((dept) => ({
+      name: dept.dept_name,
+      value: dept.dept_id,
+    }));
+
 
     const addNewRole = [
       {
         type: "input",
         message: "What is the name of the role? ",
         name: "newRoleName",
+        validate: (input) => {
+          const isText = /^[a-zA-Z]{1,30}$/;
+          if(!isText.test(input)) {
+            return "Role name must contain only letters and be less than 30 characters long."
+          }
+          return true;
+        }
       },
       {
         type: "list",
         message: "What department does the role belong to?",
         name: "newRoleDept", //must be role id
-        choices: departments, //dynamically generate list
+        choices: dChoices, //dynamically generate list
       },
       {
         type: "input",
@@ -128,7 +188,7 @@ async function promptNewRole() {
         validate: (input) => {
           //check that the input is a number using isNAN
           const isNumber = !isNaN(parseFloat(input));
-          if (!isNumber) {
+          if (!isNumber.test(input)) {
             return "Please enter a valid number";
           }
           return true;
@@ -138,10 +198,10 @@ async function promptNewRole() {
 
     // prompt the user
     const answers = await inquirer.prompt(addNewRole);
-   
+    // return answers in an object
     return {
       newRoleName: answers.newRoleName,
-      newRoleDept: answers.newRoleDept, //body.selectedDepartment seems to not work
+      newRoleDept: answers.newRoleDept,
       newRoleSalary: answers.newRoleSalary,
     };
 
@@ -151,7 +211,7 @@ async function promptNewRole() {
 };
 
 
-// new department prompt   ADD TEXT VALIDATION
+// new department prompt 
 async function promptNewDepartment() {
   try {
     const addDepartment = [
@@ -159,11 +219,20 @@ async function promptNewDepartment() {
         type: "input",
         message: "What is the name of the department? ",
         name: "deptName",
+        validate: (input) => {
+          const isText = /^[a-zA-Z]{1,30}$/;
+          if (!isText.test(input)) {
+            return "Department name must contain only letters and be less than 30 characters long.";
+          }
+          return true;
+        },
       },
     ];
 
     // prompt the user
-    await inquirer.prompt(addDepartment);
+   const answers = await inquirer.prompt(addDepartment);
+  //  return answer in an object
+   return { deptName: answers.deptName };
 
   } catch (err) {
     console.error("Error in 'New Department' prompt:", err);
@@ -174,25 +243,45 @@ async function promptNewDepartment() {
 // update employee role
 async function promptUpdateRole() {
   try {
-    const [roles, employees] = await Promise.all([roleList(), employeeList()]);
+    // const [roles, employees] = await Promise.all([roleList(), employeeList()]);
+    // store function calls in variables
+    const roles = await roleList();
+    const employees = await employeeList();
+
+    /* map roles to choices for the prompt; the name is displayed to the user, 
+    the value (id) is returned/saved to the DB */
+    const rChoices = roles.map((role) => ({
+      name: role.title,
+      value: role.role_id,
+    }));
+
+    const eChoices = employees.map((emp) => ({
+      name: emp.full_name,
+      value: emp.emp_id,
+    }));
 
     const updateRole = [
       {
         type: "list",
         message: "Which employee's role do you want to update?",
         name: "empName",
-        choices: employees, //dynamically generate list
+        choices: eChoices, //dynamically generate list
       },
       {
         type: "list",
         message: "Which role do you want to assign the selected employee?",
         name: "updatedRole",
-        choices: roles, //dynamically generate list
+        choices: rChoices, //dynamically generate list
       },
     ];
 
     // prompt the user
-    await inquirer.prompt(updateRole);
+    const answers = await inquirer.prompt(updateRole);
+    // return answers in an object
+    return {
+      empName: answers.empName,
+      updatedRole: answers.updatedRole
+    };
 
   } catch(err) {
     console.error("Error in 'Update Role' prompts:", err);
@@ -226,7 +315,7 @@ async function executePrompts() {
             await response.json();
             
           } catch (err) {
-            console.error(`Error adding role:`, err);
+            console.error(`Error adding employee:`, err);
           }
         })();
         break;

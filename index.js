@@ -142,14 +142,29 @@ app.post("/api/new-department", ({ body }, res) => {
   });
 });
 
-// update employee role
+// update employee role  /api/update-role
+app.put("/api/update-role/:id", (req, res) => {
+  const sql = `UPDATE employee SET role_id = $1 WHERE role_id = $2`;
+  // params collects data from the prompts
+  const params = [req.body.role_id];
+
+  pool.query(sql, params, (err, result) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    res.json({
+      message: `POST successful`,
+      data: body,
+    });
+  });
+});
 
 
 
 
 
-
-
+// Default response for any other request (Not Found)
 app.use((req, res) => {
   res.status(404).end();
 });
