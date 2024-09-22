@@ -470,8 +470,6 @@ async function executePrompts() {
             }
 
             const data = await response.json();
-            // console.log(data.data);
-            //------------------- RENDER TABLE HERE or in GET?? neither...-------------------------
             /* data.data is an array of objects, and the second property of 
             response.json (which is an object).render function works on arrays */
             renderTerminalTable(data.data);
@@ -504,7 +502,11 @@ async function executePrompts() {
               throw new Error(`HTTP error: ${response.status}`);
             }
 
-            await response.json();
+            const data = await response.json();
+            /* data.data is an array of objects, and the second property of 
+            response.json (which is an object).render function works on arrays */
+            renderTerminalTable(data.data);
+
             //call function here to let user to select an option again
             await executePrompts();
 
@@ -533,7 +535,11 @@ async function executePrompts() {
               throw new Error(`HTTP error: ${response.status}`);
             }
 
-            await response.json();
+            const data = await response.json();
+            /* data.data is an array of objects, and the second property of 
+            response.json (which is an object).render function works on arrays */
+            renderTerminalTable(data.data);
+
             //call function here to let user to select an option again
             await executePrompts();
 
@@ -630,7 +636,7 @@ app.get("/api/view-depts", (req, res) => {
     if (err) {
       console.error("Error executing query:", err);
       res.status(500).json({ error: err.message });
-      return;
+      // return;
     }
     res.json({
       message: "GET successful",
@@ -647,7 +653,7 @@ app.get("/api/view-roles", (req, res) => {
     if (err) {
       console.error("Error executing query:", err);
       res.status(500).json({ error: err.message });
-      return;
+      // return;
     }
     res.json({
       message: "GET successful",
