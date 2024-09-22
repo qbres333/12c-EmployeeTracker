@@ -41,17 +41,10 @@ const pool = new Pool(
 pool.connect();
 
 /** ------------------------------ INSERT PROMPT FILE DATA HERE ------------------------------- */
-/* ------------------- create functions to generate lists for prompts of type "list" ----------------------- */
 // generate list of roles from the emp_role table
 async function roleList() {
   try {
-    // retrieve id and title, but only list the titles. Can the id be used when saving to the database?
     const list = await pool.query("SELECT role_id, title FROM emp_role");
-    // const roles = list.rows.map((row) => ({
-    //   role_id: row.role_id,
-    //   title: row.title,
-    // }));
-    // return roles;
     return list.rows;
 
   } catch (err) {
@@ -59,18 +52,12 @@ async function roleList() {
   }
 };
 
-//add "None" option that makes the manager field null in the employee table
 // generate list of employees from the employee table
 async function employeeList() {
   try {
     const list = await pool.query(
       "SELECT emp_id, CONCAT(first_name, ' ', last_name) AS full_name FROM employee"
     );
-    // const employees = list.rows.map((row) => ({
-    //   emp_id: row.emp_id,
-    //   full_name: row.full_name,
-    // }));
-    // return employees;
     return list.rows;
   
   } catch (err) {
@@ -82,12 +69,6 @@ async function employeeList() {
 async function departmentList() {
   try {
     const list = await pool.query("SELECT dept_id, dept_name FROM department");
-    // const departments = list.rows.map(row => ({
-    //   dept_id: row.dept_id,
-    //   dept_name: row.dept_name,
-    // }));
-    // return departments;
-    // console.log(list.rows); //prints department list when "Add Role" is selected
     return list.rows;
 
   } catch (err) {
@@ -109,7 +90,7 @@ const mainPrompt = [
       "View All Employees",
       "View All Roles",
       "View All Departments",
-      "Quit", // pool.end(); test that this is the default case
+      "Quit", // pool.end(); 
     ],
   },
 ];
@@ -144,21 +125,22 @@ async function promptNewEmployee() {
         message: "Enter the employee's first name: ",
         name: "firstName",
         validate: (input) => {
+          // isText is a function with which we can use the .test method to test the input
           const isText = /^[a-zA-Z\s]{1,30}$/;
           if (!isText.test(input)) {
-            return "Employee name must contain only letters and be less than 30 characters long.";
+            return "Employee name must contain only letters and spaces, and be less than 30 characters long.";
           }
           return true;
         },
       },
       {
         type: "input",
-        message: "Enter the employee's last name",
+        message: "Enter the employee's last name: ",
         name: "lastName",
         validate: (input) => {
           const isText = /^[a-zA-Z\s]{1,30}$/;
           if (!isText.test(input)) {
-            return "Employee name must contain only letters and be less than 30 characters long.";
+            return "Employee name must contain only letters and spaces, and be less than 30 characters long.";
           }
           return true;
         },
@@ -207,7 +189,7 @@ async function promptNewRole() {
     const addNewRole = [
       {
         type: "input",
-        message: "What is the name of the role? ",
+        message: "What is the name of the role?: ",
         name: "newRoleName",
         validate: (input) => {
           const isText = /^[a-zA-Z\s]{1,30}$/;
@@ -219,13 +201,13 @@ async function promptNewRole() {
       },
       {
         type: "list",
-        message: "What department does the role belong to?",
+        message: "What department does the role belong to?: ",
         name: "newRoleDept", //must be role id
         choices: dChoices, //dynamically generate list
       },
       {
         type: "input",
-        message: "What is the salary of the role? ",
+        message: "What is the salary of the role?: ",
         name: "newRoleSalary",
         validate: (input) => {
           //check that the input is a number using isNAN
@@ -259,7 +241,7 @@ async function promptNewDepartment() {
     const addDepartment = [
       {
         type: "input",
-        message: "What is the name of the department? ",
+        message: "What is the name of the department?: ",
         name: "deptName",
         validate: (input) => {
           const isText = /^[a-zA-Z\s]{1,30}$/;
@@ -486,7 +468,12 @@ async function executePrompts() {
               throw new Error(`HTTP error: ${response.status}`);
             }
 
+            // const dataRetrieved = 
             await response.json();
+            //------------------- RENDER TABLE HERE or in GET?? -------------------------
+
+
+
             //call function here to let user to select an option again
             await executePrompts();
 
@@ -577,29 +564,53 @@ async function executePrompts() {
 
 /** ------------------------------ END OF PROMPT FILE DATA ------------------------------------ */
 
+// function to render GET requests in the terminal
+function renderInTerminal(data) {
+  if (data.length === 0) {
+    console.log(`No data found!`)
+    return;
+  }
+  /* result.rows is an array of objects. Display object keys as headers, 
+  and values as row data */
+  console.log(Object.keys(data[0]).join('\t'));
+  data.forEach(item => {
+    console.log(Object.values(item).join('\t'));
+  })
+
+}
+
+
 // --------------CHECK SPELLING IN QUERIES ---------------------
 // view all employees joined with manager, role, department tables
 app.get("/api/view-employees", (req, res) => {
   const sql = `SELECT employee.emp_id, employee.first_name, employee.last_name, emp_role.title, department.dept_name, emp_role.salary, CONCAT(COALESCE(manager.first_name, ''), ' ', COALESCE(manager.last_name, '')) AS manager FROM employee JOIN emp_role ON employee.role_id = emp_role.role_id JOIN department ON emp_role.dept_id = department.dept_id LEFT JOIN employee AS manager ON employee.manager_id = manager.emp_id ORDER BY emp_id ASC`;
 
-  pool.query(sql, (err, { rows }) => {
+  pool.query(sql, (err, result) => {
     if (err) {
       console.error("Error executing query:", err);
       res.status(500).json({ error: err.message });
       return;
     }
+    //prints JSON to console. What to do here to show the table??
+    // renderInTerminal(result.rows);
+    // console.log(result.rows);
+
     res.json({
       message: "GET successful",
-      data: rows,
+      // headers: tableHeaders,
+      data: result.rows,
     });
   });
 });
+
+
+
 
 // view all departments
 app.get("/api/view-depts", (req, res) => {
   const sql = `SELECT * FROM department`;
 
-  pool.query(sql, (err, { rows }) => {
+  pool.query(sql, (err, result) => {
     if (err) {
       console.error("Error executing query:", err);
       res.status(500).json({ error: err.message });
@@ -607,7 +618,7 @@ app.get("/api/view-depts", (req, res) => {
     }
     res.json({
       message: "GET successful",
-      data: rows,
+      data: result.rows,
     });
   });
 });
@@ -616,7 +627,7 @@ app.get("/api/view-depts", (req, res) => {
 app.get("/api/view-roles", (req, res) => {
   const sql = `SELECT emp_role.role_id, emp_role.title, department.dept_name, emp_role.salary FROM emp_role JOIN department ON emp_role.dept_id = department.dept_id`;
 
-  pool.query(sql, (err, { rows }) => {
+  pool.query(sql, (err, result) => {
     if (err) {
       console.error("Error executing query:", err);
       res.status(500).json({ error: err.message });
@@ -624,7 +635,7 @@ app.get("/api/view-roles", (req, res) => {
     }
     res.json({
       message: "GET successful",
-      data: rows,
+      data: result.rows,
     });
   });
 });
@@ -669,7 +680,6 @@ app.post("/api/new-role", ({ body }, res) => {
 });
 
 // add new department ----------- FIXED (posts to db) ---------------------
-// mainPrompt should show only when 
 app.post(`/api/new-department`, ({ body }, res) => {
   const sql = `INSERT INTO department (dept_name) VALUES ($1)`;
   // params collects data from the prompts
