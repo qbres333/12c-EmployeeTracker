@@ -7,23 +7,12 @@ const fs = require("fs");
 const path = require("path");
 const figlet = require("figlet");
 const { Pool } = require("pg");
-// import prompts file
-// const {
-//   roleList,
-//   employeeList,
-//   departmentList,
-//   promptNewEmployee,
-//   promptNewRole,
-//   promptNewDepartment,
-//   promptUpdateRole,
-//   executePrompts,
-// } = require("./prompts/prompts"); 
 
 // allow app to run on different ports
 const PORT = process.env.PORT || 3001;
 const app = express();
 
-// Express middleware
+// Express middleware for parsing JSON and urlencoded data
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
@@ -370,11 +359,15 @@ async function executePrompts() {
 
             await response.json();
             console.log(
-              `Added ${newEmployee.firstName} ${newEmployee.lastName} to the database`
+              `Added '${newEmployee.firstName} ${newEmployee.lastName}' to the database`
             );
-            
+            //call executePrompts to return user to mainPrompt
+            await executePrompts();
+
           } catch (err) {
             console.error(`Error adding employee:`, err);
+            //call function here to let user to select an option again after error
+            await executePrompts();
           }
         })();
         break;
@@ -399,10 +392,14 @@ async function executePrompts() {
             }
 
             await response.json();
-            console.log(`Added ${newRole.newRoleName} to the database`)
-            
+            console.log(`Added '${newRole.newRoleName}' to the database`);
+            //call executePrompts to return user to mainPrompt
+            await executePrompts();
+
           } catch (err) {
             console.error(`Error adding role:`, err);
+            //call function here to let user to select an option again after error
+            await executePrompts();
           }
         })();
         break;
@@ -427,11 +424,15 @@ async function executePrompts() {
               
             }
 
-            await response.json();
-            console.log(`Added ${newDepartment.deptName} to the database`);
+            await response.json(); //stores response in a variable
+            console.log(`Added '${newDepartment.deptName}' to the database`);
+            //call executePrompts to return user to mainPrompt
+            await executePrompts();
             
           } catch (err) {
             console.error(`Error adding department:`, err);
+            //call function here to let user to select an option again after error
+            await executePrompts();
           }
         })();
         break;
@@ -457,9 +458,13 @@ async function executePrompts() {
 
             await response.json();
             console.log(`Updated employee's role`);
-            
+            //call function here to let user to select an option again
+            await executePrompts();
+
           } catch (err) {
             console.error(`Error updating employee role:`, err);
+            //call function here to let user to select an option again after error
+            await executePrompts();
           }
         })();
         break;
@@ -482,9 +487,13 @@ async function executePrompts() {
             }
 
             await response.json();
-            
+            //call function here to let user to select an option again
+            await executePrompts();
+
           } catch (err) {
             console.error(`Error fetching all employees:`, err);
+            //call function here to let user to select an option again after error
+            await executePrompts();
           }
         })();
         break;
@@ -507,9 +516,13 @@ async function executePrompts() {
             }
 
             await response.json();
-            
+            //call function here to let user to select an option again
+            await executePrompts();
+
           } catch (err) {
             console.error(`Error fetching all roles:`, err);
+            //call function here to let user to select an option again after error
+            await executePrompts();
           }
         })();
         break;
@@ -532,10 +545,13 @@ async function executePrompts() {
             }
 
             await response.json();
-            // console.log(showDepts);
+            //call function here to let user to select an option again
+            await executePrompts();
 
           } catch (err) {
             console.error(`Error fetching all departments:`, err);
+            //call function here to let user to select an option again after error
+            await executePrompts();
           }
         })();
         break;
@@ -552,11 +568,7 @@ async function executePrompts() {
           }
         })();
     }
-    // returns to mainPrompt if "Quit" is not selected; causing repeated mainPrompts in terminal
-    //when to return to mainPrompt???
-    // if(answer.chooseOption !== "Quit") {
-    //   await executePrompts();
-    // }
+
   } catch (err) {
     console.error("Error executing prompts:", err);
   }
@@ -574,6 +586,7 @@ app.get("/api/view-employees", (req, res) => {
 
   pool.query(sql, (err, { rows }) => {
     if (err) {
+      console.error("Error executing query:", err);
       res.status(500).json({ error: err.message });
       return;
     }
@@ -590,6 +603,7 @@ app.get("/api/view-depts", (req, res) => {
 
   pool.query(sql, (err, { rows }) => {
     if (err) {
+      console.error("Error executing query:", err);
       res.status(500).json({ error: err.message });
       return;
     }
@@ -606,6 +620,7 @@ app.get("/api/view-roles", (req, res) => {
 
   pool.query(sql, (err, { rows }) => {
     if (err) {
+      console.error("Error executing query:", err);
       res.status(500).json({ error: err.message });
       return;
     }
@@ -625,14 +640,14 @@ app.post('/api/new-employee', ({body}, res) => {
 
   pool.query(sql, params, (err, result) => {
     if (err) {
-      console.error(err);
+      console.error("Error executing query:", err);
       res.status(500).json({ error: err.message });
       return;
     }
     res.json({
       message: `POST successful`,
-      data: body
-    })
+      data: result.rows[0],
+    });
   })
 });
 
@@ -645,30 +660,33 @@ app.post("/api/new-role", ({ body }, res) => {
 
   pool.query(sql, params, (err, result) => {
     if (err) {
+      console.error("Error executing query:", err);
       res.status(500).json({ error: err.message });
       return;
     }
     res.json({
       message: `POST successful`,
-      data: body,
+      data: result.rows[0],
     });
   });
 });
 
-// add new department
-app.post("/api/new-department", ({ body }, res) => {
+// add new department ----------- FIXED (posts to db), but need to add mainPrompt somewhere ---------------------
+// mainPrompt should show only when 
+app.post(`/api/new-department`, ({ body }, res) => {
   const sql = `INSERT INTO department (dept_name) VALUES ($1)`;
   // params collects data from the prompts
   const params = [body.deptName];
 
   pool.query(sql, params, (err, result) => {
     if (err) {
+      console.error("Error executing query:", err);
       res.status(500).json({ error: err.message });
       return;
     }
     res.json({
       message: `POST successful`,
-      data: body,
+      data: result.rows[0],
     });
   });
 });
