@@ -264,7 +264,7 @@ async function promptNewDepartment() {
         validate: (input) => {
           const isText = /^[a-zA-Z\s]{1,30}$/;
           if (!isText.test(input)) {
-            return "Department name must contain only letters and be less than 30 characters long.";
+            return "Department name must contain only letters and spaces, and be less than 30 characters long.";
           }
           return true;
         },
@@ -574,8 +574,6 @@ async function executePrompts() {
   }
 };
 
-// call prompts function
-// executePrompts();
 
 /** ------------------------------ END OF PROMPT FILE DATA ------------------------------------ */
 
@@ -653,8 +651,7 @@ app.post('/api/new-employee', ({body}, res) => {
 
 // add new role
 app.post("/api/new-role", ({ body }, res) => {
-  const sql = `INSERT INTO emp_role (title, dept_id, salary)
-    VALUES ($1, $2, $3)`;
+  const sql = `INSERT INTO emp_role (title, dept_id, salary) VALUES ($1, $2, $3)`;
   // params collects data from the prompts
   const params = [body.newRoleName, body.newRoleDept, body.newRoleSalary];
 
@@ -671,7 +668,7 @@ app.post("/api/new-role", ({ body }, res) => {
   });
 });
 
-// add new department ----------- FIXED (posts to db), but need to add mainPrompt somewhere ---------------------
+// add new department ----------- FIXED (posts to db) ---------------------
 // mainPrompt should show only when 
 app.post(`/api/new-department`, ({ body }, res) => {
   const sql = `INSERT INTO department (dept_name) VALUES ($1)`;
