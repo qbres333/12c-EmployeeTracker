@@ -3,39 +3,39 @@ DO $$
 
     BEGIN
 
-        INSERT INTO department (dept_id, dept_name)
+        INSERT INTO department (dept_name)
         VALUES
-            (1, 'Engineering'),
-            (2, 'Finance'),
-            (3, 'Legal'),
-            (4, 'Sales');
+            ('Engineering'),
+            ('Finance'),
+            ('Legal'),
+            ('Sales');
 
-        INSERT INTO emp_role (role_id, title, dept_id, salary)
+        INSERT INTO emp_role (title, dept_id, salary)
         VALUES
-            (1, 'Sales Lead', 4, 100000),
-            (2, 'Salesperson', 4, 80000),
-            (3, 'Lead Engineer', 1, 150000),
-            (4, 'Software Engineer', 1, 120000),
-            (5, 'Account Manager', 2, 160000),
-            (6, 'Accountant', 2, 125000),
-            (7, 'Legal Team Lead', 3, 250000),
-            (8, 'Lawyer', 3, 190000);
+            ('Sales Lead', 4, 100000),
+            ('Salesperson', 4, 80000),
+            ('Lead Engineer', 1, 150000),
+            ('Software Engineer', 1, 120000),
+            ('Account Manager', 2, 160000),
+            ('Accountant', 2, 125000),
+            ('Legal Team Lead', 3, 250000),
+            ('Lawyer', 3, 190000);
         
         -- first insert employees who do not have a manager
-        INSERT INTO employee (emp_id, first_name, last_name, role_id, manager_id)
+        INSERT INTO employee (first_name, last_name, role_id, manager_id)
         VALUES
-            (1, 'Jack', 'Frost', 1, 0),
-            (3, 'Pamela', 'Voorhees', 3, 0),
-            (5, 'Danielle', 'Harris', 5, 0),
-            (7, 'Sanna', 'Marin', 7, 0);
+            ('Jack', 'Frost', 1, 0),
+            ('Pamela', 'Voorhees', 3, 0),
+            ('Danielle', 'Harris', 5, 0),
+            ('Sanna', 'Marin', 7, 0);
 
         -- then insert employees with a manager
-        INSERT INTO employee (emp_id, first_name, last_name, role_id, manager_id)
+        INSERT INTO employee (first_name, last_name, role_id, manager_id)
         VALUES
-            (2, 'Michael', 'Myers', 2, 1),
-            (4, 'Jamie', 'Curtis', 4, 3),
-            (6, 'Angela', 'Merkel', 6, 5),
-            (8, 'Joe', 'Kabob', 8, 7);
+            ('Michael', 'Myers', 2, 1),
+            ('Jamie', 'Curtis', 4, 2),
+            ('Angela', 'Merkel', 6, 3),
+            ('Joe', 'Kabob', 8, 4);
 
 
 RAISE NOTICE 'All tables have been updated.';

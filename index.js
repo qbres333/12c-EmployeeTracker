@@ -135,7 +135,7 @@ async function promptNewEmployee() {
     // add "None" option for new employees without managers
     eChoices.push({
       name: "None",
-      value: null
+      value: 0,
     })
 
     const addNewEmployee = [
