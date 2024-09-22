@@ -7,6 +7,7 @@ const fs = require("fs");
 const path = require("path");
 const figlet = require("figlet");
 const { Pool } = require("pg");
+const Table = require('cli-table3');
 
 // allow app to run on different ports
 const PORT = process.env.PORT || 3001;
@@ -468,11 +469,12 @@ async function executePrompts() {
               throw new Error(`HTTP error: ${response.status}`);
             }
 
-            // const dataRetrieved = 
-            await response.json();
-            //------------------- RENDER TABLE HERE or in GET?? -------------------------
-
-
+            const data = await response.json();
+            // console.log(data.data);
+            //------------------- RENDER TABLE HERE or in GET?? neither...-------------------------
+            /* data.data is an array of objects, and the second property of 
+            response.json (which is an object).render function works on arrays */
+            renderTerminalTable(data.data);
 
             //call function here to let user to select an option again
             await executePrompts();
@@ -564,19 +566,40 @@ async function executePrompts() {
 
 /** ------------------------------ END OF PROMPT FILE DATA ------------------------------------ */
 
-// function to render GET requests in the terminal
-function renderInTerminal(data) {
+// function to render GET requests in the terminal (cli-table3 package)
+function renderTerminalTable(data) {
   if (data.length === 0) {
     console.log(`No data found!`)
     return;
   }
-  /* result.rows is an array of objects. Display object keys as headers, 
-  and values as row data */
-  console.log(Object.keys(data[0]).join('\t'));
-  data.forEach(item => {
-    console.log(Object.values(item).join('\t'));
-  })
 
+  const headers = Object.keys(data[0]);
+  const columnWidths = headers.map((header) => {
+    // initial column width is the header length
+    let maxWidth = header.length;
+    /* check the length of each value in the data by making it a string and 
+    getting the length */
+    data.forEach(item => {
+      const valueLength = String(item[header]).length;
+      // if the value is longer than the header, colWidth is the value length
+      maxWidth = Math.max(maxWidth, valueLength);
+    })
+    return maxWidth + 2;
+  });
+  // create table structure
+  const table = new Table({
+    // headers are the first key in each data object
+    head: headers,
+    //specify width of each column
+    colWidths: columnWidths,
+  });
+  // push non-header data into the table
+  data.forEach((item) => {
+    table.push(Object.values(item));
+  });
+  // render table based on cli-table documentation
+  console.log(table.toString());
+  
 }
 
 
@@ -589,21 +612,14 @@ app.get("/api/view-employees", (req, res) => {
     if (err) {
       console.error("Error executing query:", err);
       res.status(500).json({ error: err.message });
-      return;
+      // return;
     }
-    //prints JSON to console. What to do here to show the table??
-    // renderInTerminal(result.rows);
-    // console.log(result.rows);
-
     res.json({
       message: "GET successful",
-      // headers: tableHeaders,
       data: result.rows,
     });
   });
 });
-
-
 
 
 // view all departments
