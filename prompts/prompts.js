@@ -1,3 +1,6 @@
+
+/** Prompts were built in this file copied to the index.js, then debugged there */
+
 const inquirer = require("inquirer");
 
 /* ------------------- create functions to generate lists for prompts of type "list" ----------------------- */
@@ -6,11 +9,6 @@ async function roleList() {
   try {
     // retrieve id and title, but only list the titles. Can the id be used when saving to the database?
     const list = await pool.query("SELECT role_id, title FROM emp_role");
-    // const roles = list.rows.map((row) => ({
-    //   role_id: row.role_id,
-    //   title: row.title,
-    // }));
-    // return roles;
     return list.rows;
 
   } catch (err) {
@@ -25,11 +23,6 @@ async function employeeList() {
     const list = await pool.query(
       "SELECT emp_id, CONCAT(first_name, ' ', last_name) AS full_name FROM employee"
     );
-    // const employees = list.rows.map((row) => ({
-    //   emp_id: row.emp_id,
-    //   full_name: row.full_name,
-    // }));
-    // return employees;
     return list.rows;
   
   } catch (err) {
@@ -41,11 +34,6 @@ async function employeeList() {
 async function departmentList() {
   try {
     const list = await pool.query("SELECT dept_id, dept_name FROM department");
-    // const departments = list.rows.map(row => ({
-    //   dept_id: row.dept_id,
-    //   dept_name: row.dept_name,
-    // }));
-    // return departments;
     return list.rows;
 
   } catch (err) {
@@ -67,7 +55,7 @@ const mainPrompt = [
       "View All Employees",
       "View All Roles",
       "View All Departments",
-      "Quit", // pool.end(); test that this is the default case
+      "Quit", // pool.end();
     ],
   },
 ];
