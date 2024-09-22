@@ -20,7 +20,8 @@ DO $$
             (6, 'Accountant', 2, 125000),
             (7, 'Legal Team Lead', 3, 250000),
             (8, 'Lawyer', 3, 190000);
-                   
+        
+        -- first insert employees who do not have a manager
         INSERT INTO employee (emp_id, first_name, last_name, role_id, manager_id)
         VALUES
             (1, 'Jack', 'Frost', 1, 0),
@@ -28,32 +29,13 @@ DO $$
             (5, 'Danielle', 'Harris', 5, 0),
             (7, 'Sanna', 'Marin', 7, 0);
 
-                   
+        -- then insert employees with a manager
         INSERT INTO employee (emp_id, first_name, last_name, role_id, manager_id)
         VALUES
             (2, 'Michael', 'Myers', 2, 1),
             (4, 'Jamie', 'Curtis', 4, 3),
             (6, 'Angela', 'Merkel', 6, 5),
             (8, 'Joe', 'Kabob', 8, 7);
-
-
-        -- INSERT INTO manager (first_name, last_name)
-        -- VALUES
-        --     ('Jack', 'Frost'),
-        --     ('Michael', 'Myers'),
-        --     ('Pamela', 'Voorhees'),
-        --     ('Jamie', 'Curtis'),
-        --     ('Danielle', 'Harris'),
-        --     ('Angela', 'Merkel'),
-        --     ('Sanna', 'Marin'),
-        --     ('Joe', 'Kabob');
-
-        -- INSERT INTO employee (emp_id, manager_id)
-        -- VALUES
-        --     (2, 2),
-        --     (4, 4),
-        --     (6, 6),
-        --     (8, 4);
 
 
 RAISE NOTICE 'All tables have been updated.';

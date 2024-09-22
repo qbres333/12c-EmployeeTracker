@@ -98,7 +98,7 @@ async function departmentList() {
     //   dept_name: row.dept_name,
     // }));
     // return departments;
-    console.log(list.rows);
+    // console.log(list.rows); //prints department list when "Add Role" is selected
     return list.rows;
 
   } catch (err) {
@@ -240,8 +240,8 @@ async function promptNewRole() {
         name: "newRoleSalary",
         validate: (input) => {
           //check that the input is a number using isNAN
-          const isNumber = !isNaN(parseFloat(input));
-          if (!isNumber.test(input)) {
+          const isNumber = !isNaN(parseFloat(input)) && parseFloat(input) > 0;
+          if (!isNumber) {
             return "Please enter a valid number";
           }
           return true;
@@ -570,7 +570,7 @@ async function executePrompts() {
 // --------------CHECK SPELLING IN QUERIES ---------------------
 // view all employees joined with manager, role, department tables
 app.get("/api/view-employees", (req, res) => {
-  const sql = `SELECT employee.emp_id, employee.first_name, employee.last_name, emp_role.title, department.dept_name, emp_role.salary, CONCAT(manager.first_name, ' ', COALESCE(manager.last_name, '')) AS manager FROM employee JOIN emp_role ON employee.role_id = emp_role.role_id JOIN department ON emp_role.dept_id = department.dept_id LEFT JOIN manager ON employee.manager_id = manager.manager_id ORDER BY emp_id ASC`;
+  const sql = `SELECT employee.emp_id, employee.first_name, employee.last_name, emp_role.title, department.dept_name, emp_role.salary, CONCAT(COALESCE(manager.first_name, ''), ' ', COALESCE(manager.last_name, '')) AS manager FROM employee JOIN emp_role ON employee.role_id = emp_role.role_id JOIN department ON emp_role.dept_id = department.dept_id LEFT JOIN employee AS manager ON employee.manager_id = manager.emp_id ORDER BY emp_id ASC`;
 
   pool.query(sql, (err, { rows }) => {
     if (err) {
@@ -625,6 +625,7 @@ app.post('/api/new-employee', ({body}, res) => {
 
   pool.query(sql, params, (err, result) => {
     if (err) {
+      console.error(err);
       res.status(500).json({ error: err.message });
       return;
     }
