@@ -651,6 +651,7 @@ function renderTerminalTable(data) {
     })
     return maxWidth + 2;
   });
+
   // create table structure
   const table = new Table({
     // headers are the first key in each data object
@@ -658,21 +659,9 @@ function renderTerminalTable(data) {
     //specify width of each column
     colWidths: columnWidths,
     chars: {
-      top: "-",
-      "top-mid": "╤",
-      "top-left": "╔",
-      "top-right": "╗",
-      bottom: "-",
-      "bottom-mid": "╧",
-      "bottom-left": "╚",
-      "bottom-right": "╝",
-      left: "║",
-      "left-mid": "╟",
-      mid: "─",
-      "mid-mid": "┼",
-      right: "║",
-      "right-mid": "╢",
-      middle: "│",
+      mid: "-",
+      "mid-mid": "+",
+      middle: "|",
     },
     style: {
       "padding-left": 0,
