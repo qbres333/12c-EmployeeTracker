@@ -658,14 +658,28 @@ function renderTerminalTable(data) {
     //specify width of each column
     colWidths: columnWidths,
     chars: {
-      top: "─", //top of table
-      bottom: "─", //bottom of the table
-      left: "|", //left side of table
-      mid: "─", //between rows; ---------- should this be underscore? ----------
-      right: "|", //right side of table
-      middle: "│", //between columns
+      top: "-",
+      "top-mid": "╤",
+      "top-left": "╔",
+      "top-right": "╗",
+      bottom: "-",
+      "bottom-mid": "╧",
+      "bottom-left": "╚",
+      "bottom-right": "╝",
+      left: "║",
+      "left-mid": "╟",
+      mid: "─",
+      "mid-mid": "┼",
+      right: "║",
+      "right-mid": "╢",
+      middle: "│",
     },
-    style: { padding: 0 },
+    style: {
+      "padding-left": 0,
+      "padding-right": 0,
+      head: ["red"],
+      border: ["grey"],
+    },
   });
   // push non-header data into the table
   data.forEach((item) => {
