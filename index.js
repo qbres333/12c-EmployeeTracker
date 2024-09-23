@@ -227,7 +227,7 @@ async function promptNewRole() {
     // return answers in an object
     return {
       newRoleName: answers.newRoleName,
-      newRoleDept: answers.newRoleDept,
+      newRoleDept: answers.newRoleDept, //this is the dept_id
       newRoleSalary: answers.newRoleSalary,
     };
 
@@ -361,7 +361,7 @@ async function executePrompts() {
       case "Add Employee":
         (async () => {
           try {
-            const newEmployee = await promptNewEmployee();
+            const newEmployee = await promptNewEmployee(); //call prompt and stores values in variable
             const response = await fetch(
               `http://localhost:${PORT}/api/new-employee`,
               {
@@ -394,7 +394,7 @@ async function executePrompts() {
       case "Add Role":
         (async () => {
           try {
-            const newRole = await promptNewRole();
+            const newRole = await promptNewRole(); //call prompt and stores values in variable
             const response = await fetch(
               `http://localhost:${PORT}/api/new-role`,
               {
@@ -425,7 +425,7 @@ async function executePrompts() {
       case "Add Department":
         (async () => {
           try {
-            const newDepartment = await promptNewDepartment();
+            const newDepartment = await promptNewDepartment(); //call prompt and stores values in variable
             const response = await fetch(
               `http://localhost:${PORT}/api/new-department`,
               {
@@ -456,7 +456,7 @@ async function executePrompts() {
       case "Update Employee Role":
         (async () => {
           try {
-            const updatedEmpRole = await promptUpdateRole();
+            const updatedEmpRole = await promptUpdateRole(); //call prompt and stores values in variable
             const response = await fetch(
               `http://localhost:${PORT}/api/update-role`,
               {
@@ -487,7 +487,7 @@ async function executePrompts() {
       case "Update Employee Manager":
         (async () => {
           try {
-            const updatedEmpMgr = await promptUpdateManager();
+            const updatedEmpMgr = await promptUpdateManager(); //call prompt and stores values in variable
             const response = await fetch(
               `http://localhost:${PORT}/api/update-manager`,
               {
@@ -534,7 +534,7 @@ async function executePrompts() {
 
             const data = await response.json();
             /* data.data is an array of objects, and the second property of 
-            response.json (which is an object).render function works on arrays */
+            response.json (which is an object). render function works on arrays */
             renderTerminalTable(data.data);
 
             //call function here to let user to select an option again
@@ -637,12 +637,14 @@ async function executePrompts() {
 
 
 // function to render GET requests in the terminal (cli-table3 package)
+// accepts an array parameter (data)
 function renderTerminalTable(data) {
   if (data.length === 0) {
     console.log(`No data found!`)
     return;
   }
-
+  
+  // set up required table properties
   const headers = Object.keys(data[0]);
   const columnWidths = headers.map((header) => {
     // initial column width is the header length
@@ -664,9 +666,9 @@ function renderTerminalTable(data) {
     //specify width of each column
     colWidths: columnWidths,
     chars: {
-      mid: "-",
-      "mid-mid": "+",
-      middle: "|",
+      mid: "-", // horizontal row divider
+      "mid-mid": "+", // where rows and columns meet
+      middle: "|", // vertical column divider
     },
     style: {
       "padding-left": 0,
