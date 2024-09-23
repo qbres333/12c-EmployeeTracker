@@ -1,0 +1,56 @@
+[
+  {
+    "role_id": 1,
+    "title": "Sales Lead",
+    "dept_id": 4,
+    "salary": "100000"
+  },
+  {
+    "role_id": 2,
+    "title": "Salesperson",
+    "dept_id": 4,
+    "salary": "80000"
+  },
+  {
+    "role_id": 3,
+    "title": "Lead Engineer",
+    "dept_id": 1,
+    "salary": "150000"
+  },
+  {
+    "role_id": 4,
+    "title": "Software Engineer",
+    "dept_id": 1,
+    "salary": "120000"
+  },
+  {
+    "role_id": 5,
+    "title": "Account Manager",
+    "dept_id": 2,
+    "salary": "160000"
+  },
+  {
+    "role_id": 6,
+    "title": "Accountant",
+    "dept_id": 2,
+    "salary": "125000"
+  },
+  {
+    "role_id": 7,
+    "title": "Legal Team Lead",
+    "dept_id": 3,
+    "salary": "250000"
+  },
+  {
+    "role_id": 8,
+    "title": "Lawyer",
+    "dept_id": 3,
+    "salary": "190000"
+  },
+  {
+    "role_id": 9,
+    "title": "Database Administrator",
+    "dept_id": 1,
+    "salary": "165000"
+  }
+]

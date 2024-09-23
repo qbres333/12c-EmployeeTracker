@@ -614,7 +614,12 @@ async function executePrompts() {
       default:
         (async () => {
           try {
-            const exitMessage = "You have exited from the database.";
+            //save the edited tables to the directory in case changes need to be reverted
+            await saveDB("SELECT * FROM employee", "employee");
+            await saveDB("SELECT * FROM department", "department");
+            await saveDB("SELECT * FROM emp_role", "emp_role");
+            
+            const exitMessage = "Changes are saved. You have exited from the database.";
             console.log(exitMessage);
             await pool.end();
           } catch (err) {
@@ -679,7 +684,7 @@ function renderTerminalTable(data) {
   
 }
 
-// function to create a formatted timestamp for the fileName
+// function to create a formatted timestamp for the fileName (uniqueness)
 function formatTimestamp() {
   const timeNow = new Date();
   //use reg exp to replace characters for valid file name

@@ -1,0 +1,65 @@
+[
+  {
+    "emp_id": 1,
+    "first_name": "Jack",
+    "last_name": "Frost",
+    "role_id": 1,
+    "manager_id": 0
+  },
+  {
+    "emp_id": 2,
+    "first_name": "Pamela",
+    "last_name": "Voorhees",
+    "role_id": 3,
+    "manager_id": 0
+  },
+  {
+    "emp_id": 3,
+    "first_name": "Danielle",
+    "last_name": "Harris",
+    "role_id": 5,
+    "manager_id": 0
+  },
+  {
+    "emp_id": 4,
+    "first_name": "Sanna",
+    "last_name": "Marin",
+    "role_id": 7,
+    "manager_id": 0
+  },
+  {
+    "emp_id": 5,
+    "first_name": "Michael",
+    "last_name": "Myers",
+    "role_id": 2,
+    "manager_id": 1
+  },
+  {
+    "emp_id": 7,
+    "first_name": "Angela",
+    "last_name": "Merkel",
+    "role_id": 6,
+    "manager_id": 3
+  },
+  {
+    "emp_id": 9,
+    "first_name": "Luther",
+    "last_name": "Vandross",
+    "role_id": 2,
+    "manager_id": 3
+  },
+  {
+    "emp_id": 6,
+    "first_name": "Jamie",
+    "last_name": "Curtis",
+    "role_id": 9,
+    "manager_id": 2
+  },
+  {
+    "emp_id": 8,
+    "first_name": "Joe",
+    "last_name": "Kabob",
+    "role_id": 8,
+    "manager_id": 9
+  }
+]
