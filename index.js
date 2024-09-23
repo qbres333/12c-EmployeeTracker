@@ -41,7 +41,7 @@ const pool = new Pool(
 
 pool.connect();
 
-/** ------------------------------ INSERT PROMPT FILE DATA HERE ------------------------------- */
+/** ------------------------------------ INSERT PROMPT FILE DATA HERE ----------------------------------- */
 // generate list of roles from the emp_role table
 async function roleList() {
   try {
@@ -351,7 +351,7 @@ async function promptUpdateManager() {
 };
 
 
-/** ------------------------------ send collected prompt data to API endpoints ---------------------------- */
+/** --------------------- send collected prompt data to API endpoints ------------------------ */
 async function executePrompts() {
   try {
     const answer = await inquirer.prompt(mainPrompt);
@@ -633,7 +633,7 @@ async function executePrompts() {
   }
 };
 
-/** ------------------------------ END OF PROMPT FILE DATA ------------------------------------ */
+/** ---------------------------------------- END OF PROMPT FILE DATA ------------------------------------ */
 
 
 // function to render GET requests in the terminal (cli-table3 package)
