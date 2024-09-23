@@ -119,7 +119,7 @@ async function promptNewEmployee() {
     eChoices.push({
       name: "None",
       value: 0,
-    })
+    });
 
     const addNewEmployee = [
       {
@@ -176,7 +176,7 @@ async function promptNewEmployee() {
   }
 };
 
-/** --------------------------------------------- all prompts --------------------------------------------- */
+/** ------------------------------ all prompts -------------------------------- */
 // new role prompts 
 async function promptNewRole() {
   try {
@@ -320,7 +320,7 @@ async function promptUpdateManager() {
     const eChoices = employees.map((emp) => ({
       name: emp.full_name,
       value: emp.emp_id,
-    }));
+    }));    
 
     const updateManager = [
       {
@@ -628,8 +628,8 @@ async function executePrompts() {
   }
 };
 
-
 /** ------------------------------ END OF PROMPT FILE DATA ------------------------------------ */
+
 
 // function to render GET requests in the terminal (cli-table3 package)
 function renderTerminalTable(data) {
@@ -679,6 +679,32 @@ function renderTerminalTable(data) {
   
 }
 
+// function to create a formatted timestamp for the fileName
+function formatTimestamp() {
+  const timeNow = new Date();
+  //use reg exp to replace characters for valid file name
+  //replace colons, remove fractional seconds from timestamp
+  return timeNow.toISOString().replace(/:/g, '-').replace(/\..+/, '');
+}
+// function to save changes to the database to db_history folder
+async function saveDB(query, fileName) {
+  try {
+    const result = await pool.query(query);
+    const data = result.rows;
+
+    // call timestamp function and set file name
+    const timestamp = formatTimestamp();
+    const newFileName = `${fileName}_${timestamp}.json`;
+    //set file path
+    const filePath = path.join(__dirname, 'db_history', newFileName);
+    //write to a JSON file synchronously with writeFileSync
+    fs.writeFileSync(filePath, JSON.stringify(data,null,2));
+
+  } catch (err) {
+    console.error(`Error saving table to directory:`, err);
+  }
+}
+
 // view all employees joined with manager, role, department tables
 app.get("/api/view-employees", (req, res) => {
   const sql = `SELECT employee.emp_id, employee.first_name, employee.last_name, emp_role.title, department.dept_name, emp_role.salary, CONCAT(COALESCE(manager.first_name, ''), ' ', COALESCE(manager.last_name, '')) AS manager FROM employee JOIN emp_role ON employee.role_id = emp_role.role_id JOIN department ON emp_role.dept_id = department.dept_id LEFT JOIN employee AS manager ON employee.manager_id = manager.emp_id ORDER BY emp_id ASC`;
@@ -695,7 +721,6 @@ app.get("/api/view-employees", (req, res) => {
     });
   });
 });
-
 
 // view all departments
 app.get("/api/view-depts", (req, res) => {
