@@ -88,6 +88,7 @@ const mainPrompt = [
       "Add Role",
       "Add Department",
       "Update Employee Role",
+      "Update Employee Manager",
       "View All Employees",
       "View All Roles",
       "View All Departments",
@@ -235,7 +236,6 @@ async function promptNewRole() {
   }
 };
 
-
 // new department prompt 
 async function promptNewDepartment() {
   try {
@@ -264,16 +264,13 @@ async function promptNewDepartment() {
   }
 };
 
-
 // update employee role
 async function promptUpdateRole() {
   try {
-    // const [roles, employees] = await Promise.all([roleList(), employeeList()]);
-    // store function calls in variables
     const roles = await roleList();
     const employees = await employeeList();
 
-    /* map roles to choices for the prompt; the name is displayed to the user, 
+    /* map roles/employees to choices for the prompt; the name is displayed to the user, 
     the value (id) is returned/saved to the DB */
     const rChoices = roles.map((role) => ({
       name: role.title,
@@ -313,6 +310,46 @@ async function promptUpdateRole() {
   }
 };
 
+// update employee manager
+async function promptUpdateManager() {
+  try {
+    const employees = await employeeList();
+
+    /* map employees to choices for the prompt; the name is displayed to the user, 
+    the value (id) is returned/saved to the DB */
+    const eChoices = employees.map((emp) => ({
+      name: emp.full_name,
+      value: emp.emp_id,
+    }));
+
+    const updateManager = [
+      {
+        type: "list",
+        message: "Which employee's manager do you want to update?",
+        name: "empName",
+        choices: eChoices, //dynamically generate list
+      },
+      {
+        type: "list",
+        message: "Which manager do you want to assign the selected employee?",
+        name: "updatedManager",
+        choices: eChoices, //dynamically generate list
+      },
+    ];
+
+    // prompt the user
+    const answers = await inquirer.prompt(updateManager);
+    // return answers in an object
+    return {
+      empName: answers.empName,
+      updatedManager: answers.updatedManager,
+    };
+
+  } catch(err) {
+    console.error("Error in 'Update Manager' prompts:", err);
+  }
+};
+
 
 /** ------------------------------ send collected prompt data to API endpoints ---------------------------- */
 async function executePrompts() {
@@ -346,7 +383,6 @@ async function executePrompts() {
             );
             //call executePrompts to return user to mainPrompt
             await executePrompts();
-
           } catch (err) {
             console.error(`Error adding employee:`, err);
             //call function here to let user to select an option again after error
@@ -378,7 +414,6 @@ async function executePrompts() {
             console.log(`Added '${newRole.newRoleName}' to the database`);
             //call executePrompts to return user to mainPrompt
             await executePrompts();
-
           } catch (err) {
             console.error(`Error adding role:`, err);
             //call function here to let user to select an option again after error
@@ -404,14 +439,12 @@ async function executePrompts() {
 
             if (!response.ok) {
               throw new Error(`HTTP error: ${response.status}`);
-              
             }
 
             await response.json(); //stores response in a variable
             console.log(`Added '${newDepartment.deptName}' to the database`);
             //call executePrompts to return user to mainPrompt
             await executePrompts();
-            
           } catch (err) {
             console.error(`Error adding department:`, err);
             //call function here to let user to select an option again after error
@@ -443,9 +476,39 @@ async function executePrompts() {
             console.log(`Updated employee's role`);
             //call function here to let user to select an option again
             await executePrompts();
-
           } catch (err) {
             console.error(`Error updating employee role:`, err);
+            //call function here to let user to select an option again after error
+            await executePrompts();
+          }
+        })();
+        break;
+
+      case "Update Employee Manager":
+        (async () => {
+          try {
+            const updatedEmpMgr = await promptUpdateManager();
+            const response = await fetch(
+              `http://localhost:${PORT}/api/update-manager`,
+              {
+                method: "PUT",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify(updatedEmpMgr),
+              }
+            );
+
+            if (!response.ok) {
+              throw new Error(`HTTP error: ${response.status}`);
+            }
+
+            await response.json();
+            console.log(`Updated employee's manager`);
+            //call function here to let user to select an option again
+            await executePrompts();
+          } catch (err) {
+            console.error(`Error updating employee manager:`, err);
             //call function here to let user to select an option again after error
             await executePrompts();
           }
@@ -476,7 +539,6 @@ async function executePrompts() {
 
             //call function here to let user to select an option again
             await executePrompts();
-
           } catch (err) {
             console.error(`Error fetching all employees:`, err);
             //call function here to let user to select an option again after error
@@ -509,7 +571,6 @@ async function executePrompts() {
 
             //call function here to let user to select an option again
             await executePrompts();
-
           } catch (err) {
             console.error(`Error fetching all roles:`, err);
             //call function here to let user to select an option again after error
@@ -542,7 +603,6 @@ async function executePrompts() {
 
             //call function here to let user to select an option again
             await executePrompts();
-
           } catch (err) {
             console.error(`Error fetching all departments:`, err);
             //call function here to let user to select an option again after error
@@ -557,7 +617,6 @@ async function executePrompts() {
             const exitMessage = "You have exited from the database.";
             console.log(exitMessage);
             await pool.end();
-            
           } catch (err) {
             console.error(`Error exiting database:`, err);
           }
@@ -598,18 +657,25 @@ function renderTerminalTable(data) {
     head: headers,
     //specify width of each column
     colWidths: columnWidths,
+    chars: {
+      top: "─", //top of table
+      bottom: "─", //bottom of the table
+      left: "|", //left side of table
+      mid: "─", //between rows; ---------- should this be underscore? ----------
+      right: "|", //right side of table
+      middle: "│", //between columns
+    },
+    style: { padding: 0 },
   });
   // push non-header data into the table
   data.forEach((item) => {
     table.push(Object.values(item));
   });
-  // render table based on cli-table documentation
+  // render table
   console.log(table.toString());
   
 }
 
-
-// --------------CHECK SPELLING IN QUERIES ---------------------
 // view all employees joined with manager, role, department tables
 app.get("/api/view-employees", (req, res) => {
   const sql = `SELECT employee.emp_id, employee.first_name, employee.last_name, emp_role.title, department.dept_name, emp_role.salary, CONCAT(COALESCE(manager.first_name, ''), ' ', COALESCE(manager.last_name, '')) AS manager FROM employee JOIN emp_role ON employee.role_id = emp_role.role_id JOIN department ON emp_role.dept_id = department.dept_id LEFT JOIN employee AS manager ON employee.manager_id = manager.emp_id ORDER BY emp_id ASC`;
@@ -701,7 +767,7 @@ app.post("/api/new-role", ({ body }, res) => {
   });
 });
 
-// add new department ----------- FIXED (posts to db) ---------------------
+// add new department 
 app.post(`/api/new-department`, ({ body }, res) => {
   const sql = `INSERT INTO department (dept_name) VALUES ($1)`;
   // params collects data from the prompts
@@ -720,7 +786,7 @@ app.post(`/api/new-department`, ({ body }, res) => {
   });
 });
 
-// update employee role  /api/update-role
+// update employee role  
 app.put("/api/update-role/", ({ body }, res) => {
   const sql = `UPDATE employee SET role_id = $1 WHERE emp_id = $2`;
   // params collects data from the prompts
@@ -736,6 +802,27 @@ app.put("/api/update-role/", ({ body }, res) => {
         message: `Update (PUT) successful`,
         data: body,
         changes: result.rowCount
+      });
+    }
+  });
+});
+
+// update employee manager 
+app.put("/api/update-manager", ({ body }, res) => {
+  const sql = `UPDATE employee SET manager_id = $1 WHERE emp_id = $2`;
+  // params collects data from the prompts
+  const params = [body.updatedManager, body.empName];
+
+  pool.query(sql, params, (err, result) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+    } else if (!result.rowCount) {
+      res.json({ message: "Employee not found!" });
+    } else {
+      res.json({
+        message: `Update (PUT) successful`,
+        data: body,
+        changes: result.rowCount,
       });
     }
   });

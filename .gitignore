@@ -1,4 +1,4 @@
 # Ignore the .env file (storing sensitive environment variables)
 .env
-# Ignore prompts.js file, this was copied to and debugged in the index.js file
-/prompts/prompts.js
+# ignore Assets folder
+/Assets/
