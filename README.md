@@ -24,7 +24,7 @@ Users can efficiently navigate the employee database through a series of guided 
 
 To begin using the Employee Tracker app, download and install Node.js and postgreSQL. Clone the project repo to your desired location. To query the default database, right-click on the "db" folder in the project directory, and select "Open in Integrated Terminal". Type "psql -U postgres" into the terminal, then enter your password when prompted. Use postgreSQL command "\i" to setup the schema.sql file, followed by the seeds.sql file. You can then close this terminal window, or leave it open to enter your custom queries directly into that terminal. 
 
-To dynamically change the database, right-click on the index.js file in the project directory, and select "Open in Integrated Terminal". Enter the command "node index" and press enter on your keyboard. Select any of the prompts and enjoy! 
+To dynamically change the database, right-click on the index.js file in the project directory, and select "Open in Integrated Terminal". enter "npm i" in the terminal to install the necessary packages. Enter the command "node index" and press enter on your keyboard. Select any of the prompts and enjoy! 
 
 Note: In order for your changes to be saved in the directory, you must select "Quit" from the prompt choices after you've made all of your changes. If "Quit" is not selected, all changes will be lost.
 

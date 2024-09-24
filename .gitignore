@@ -2,3 +2,5 @@
 .env
 # ignore Assets folder
 /Assets/
+# ignore node modules
+/node_modules/
